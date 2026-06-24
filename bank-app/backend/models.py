@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from datetime import datetime
 
 from database import Base
@@ -13,6 +13,6 @@ class Account(Base):
     balance = Column(Integer, nullable=False, default=0)
 
     created_at = Column(DateTime, default=datetime.utcnow)
+    frozen = Column(Boolean, default=False)
 
-    
 
