@@ -21,6 +21,8 @@ class AccountUpdate(BaseModel):
     owner_name: Optional[str] = None
     account_type: Optional[str] = None
     balance: Optional[int] = None
+
+    
 class AccountResponse(BaseModel): #what the api sends back
     id: int
     owner_name: str

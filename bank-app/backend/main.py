@@ -1,11 +1,26 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
+from typing import list
 
-from database import SessionLocal
+from database import SessionLocal, engine, Base
 from models import Account
-from schemas import AccountCreate, AccountResponse
+from schemas import AccountCreate, AccountResponse, AccountUpdate
+
+Base.metadata.create_all(bind=engine) #Look at all SQLAlchemy models that inherit from Base, and create their tables in Postgres if they don’t exist.
+
+"""
+models.py inherits Base & creates this 
+
+CREATE TABLE accounts (
+    id SERIAL PRIMARY KEY,
+    owner_name VARCHAR,
+    account_type VARCHAR,
+    balance INTEGER,
+    created_at TIMESTAMP
+);
 
 
+"""
 """
 
 With yield
@@ -48,4 +63,53 @@ def create_account(accounts: AccountCreate, db: Session = Depends(get_db)):
     db.refresh(new_account)
 
     return new_account
+
+@app.get("/accounts", response_model=List[AccountResponse])
+def get_accounts(db: Session = Depends(get_db)):
+    accounts = db.query(Account).all() #“SELECT * FROM accounts”
+    return accounts
+
+@app.get("/accounts/{id}", response_model=AccountResponse)
+def get_account_id(id: int, db: Session = Depends(get_db)):
+    account = db.query(Account).filter(Account.id == id).first()
+
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+    
+    return account
+
+@app.put("/accounts/{id}", response_model=AccountResponse)
+def update_account(id: int, updated_data: AccountUpdate, db: Session = Depends(get_db)):
+    
+    account = db.query(Account).filter(Account.id == id).first()
+
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+
+    if updated_data.owner_name is not None:
+        account.owner_name = updated_data.owner_name
+
+    if updated_data.account_type is not None:
+        account.account_type = updated_data.account_type
+
+    if updated_data.balance is not None:
+        account.balance = updated_data.balance
+
+    db.commit()
+    db.refresh(account)
+
+    return account
+
+@app.delete("/accounts/{id}")
+def delete_account(id: int, db: Session = Depends(get_db)):
+    
+    account = db.query(Account).filter(Account.id == id).first()
+
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+
+    db.delete(account)
+    db.commit()
+
+    return {"message": f"Account: {id} deleted successfully"}
 
