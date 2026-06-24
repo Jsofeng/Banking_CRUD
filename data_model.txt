@@ -1,6 +1,17 @@
+DATABASE
+
 Account
 - id
 - owner_name
 - account_type  (chequing / savings)
 - balance
 - created_at
+
+
+FRONTEND 
+- npm create vite@latest frontend -- --template react 
+- User types → React stores values → Form submits → Backend receives data
+- AccountForm - the form to create an account_type (sends POST req to backend)
+- AccountCard - displays one account_type (sends GET /account/{id} req to backend)
+- AccountList - holds all the cards (sends GET /account req to backend)
+

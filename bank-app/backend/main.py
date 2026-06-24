@@ -63,7 +63,7 @@ def create_account(accounts: AccountCreate, db: Session = Depends(get_db)):
 
     return new_account
 
-@app.get("/accounts", response_model=List[AccountResponse])
+@app.get("/accounts", response_model=list[AccountResponse])
 def get_accounts(db: Session = Depends(get_db)):
     accounts = db.query(Account).all() #“SELECT * FROM accounts”
     return accounts
