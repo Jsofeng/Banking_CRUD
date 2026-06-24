@@ -9,6 +9,7 @@ function AccountForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    /* react uses camelCase & python uses snake_case */ 
     const newAccount = {
       owner_name: ownerName,
       account_type: accountType,
@@ -28,12 +29,12 @@ function AccountForm() {
         onChange={(e) => setOwnerName(e.target.value)}
         placeholder="Owner Name"
       />
-
+    
       <select
         value={accountType}
         onChange={(e) => setAccountType(e.target.value)}
       >
-        <option value="chequing">Chequing</option>
+        <option value="chequing">Chequing</option> 
         <option value="savings">Savings</option>
       </select>
 
