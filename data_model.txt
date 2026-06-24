@@ -1,0 +1,6 @@
+Account
+- id
+- owner_name
+- account_type  (chequing / savings)
+- balance
+- created_at
