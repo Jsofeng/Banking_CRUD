@@ -6,6 +6,7 @@ function AccountList() {
     const [accounts, setAccounts] = useState([]);
     
     // 1. Fetch data when component loads
+    // can only use then when it's not async/await fetch
     // what you receive after fetching take response.json -> put that data into setAccounts 
     useEffect(() => {
         fetch("http://localhost:8000/accounts")
@@ -15,6 +16,7 @@ function AccountList() {
     }, []);
 
     // 2. Delete handler (remove from UI after backend delete)
+
     const handleDelete = (id) => {
         setAccounts(accounts.filter((acc) => acc.id !== id));
     };

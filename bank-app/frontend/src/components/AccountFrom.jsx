@@ -6,7 +6,7 @@ function AccountForm() {
   const [balance, setBalance] = useState(0);
 
   /* when user clicks button */
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     /* react uses camelCase & python uses snake_case */ 
@@ -16,18 +16,30 @@ function AccountForm() {
       balance: Number(balance),
     };
 
-
-    fetch("http://localhost:8000/accounts", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newAccount),
-    })
-        .then(response => response.json())
-        .then(data => console.log(data));
-
+    try {
+        const response = await fetch("http://localhost:8000/accounts", 
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(newAccount),
+            }
+        );
+        
+        if (!response.ok) {
+            throw new Error("Failed to create account");
+        }
+        
+        const data = await response.json();
+        console.log(data);
+    
+    } catch (error) {
+        alert("Something went wrong while creating the account.");
+        console.error(error);
+    }
     };
+
 
   return (
     <form onSubmit={handleSubmit}>
