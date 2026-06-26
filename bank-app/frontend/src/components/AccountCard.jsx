@@ -18,14 +18,15 @@ function AccountCard({ account, onDelete }) {
     });
     };
 
-
-  const handleDelete = async () => {
-    await fetch(`http://localhost:8000/accounts/${account.id}`, {
-      method: "DELETE",
-    });
-
-    onDelete(account.id);
-  };
+    const handleDelete = () => {
+        fetch(`http://localhost:8000/accounts/${account.id}`, {
+            method: "DELETE"
+        })
+        .then(response => response.json())
+        .then(() => {
+            onDelete(account.id);
+        });
+    };
 
 
   return (
