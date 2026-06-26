@@ -6,15 +6,12 @@ function AccountList() {
     const [accounts, setAccounts] = useState([]);
     
     // 1. Fetch data when component loads
+    // what you receive after fetching take response.json -> put that data into setAccounts 
     useEffect(() => {
-        const fetchAccounts = async () => {
-        const response = await fetch("http://localhost:8000/accounts"); /* what you receive */
-        const data = await response.json(); /* what you input Convert backend response → JavaScript array */
-        setAccounts(data); // same accounts get store in setAccounts now
-
-        };
-        
-        fetchAccounts(); 
+        fetch("http://localhost:8000/accounts")
+            .then(response => response.json()) // Convert JSON text → JavaScript objects
+            .then(data => setAccounts(data))   // Store the accounts in state
+            .catch(error => console.error(error)); 
     }, []);
 
     // 2. Delete handler (remove from UI after backend delete)

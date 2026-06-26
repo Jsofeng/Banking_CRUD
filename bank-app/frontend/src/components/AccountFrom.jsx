@@ -16,8 +16,18 @@ function AccountForm() {
       balance: Number(balance),
     };
 
-    console.log(newAccount);
-  };
+
+    fetch("http://localhost:8000/accounts", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newAccount),
+    })
+        .then(response => response.json())
+        .then(data => console.log(data));
+
+    };
 
   return (
     <form onSubmit={handleSubmit}>
