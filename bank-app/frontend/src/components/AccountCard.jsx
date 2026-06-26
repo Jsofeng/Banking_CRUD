@@ -18,12 +18,14 @@ function AccountCard({ account, onDelete }) {
     });
     };
 
+    // not using async here bc backend delete endpoint returns json so response.json() can read it 
     const handleDelete = () => {
         fetch(`http://localhost:8000/accounts/${account.id}`, {
             method: "DELETE"
         })
         .then(response => response.json())
-        .then(() => {
+        .then(data => {
+            console.log(data.message);
             onDelete(account.id);
         });
     };
