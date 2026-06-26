@@ -19,6 +19,15 @@ function AccountList() {
         setAccounts(accounts.filter((acc) => acc.id !== id));
     };
 
+    // Searches the accounts hashmap Find the account that was edited, replace it with the new version, keep everything else the same.
+    const handleEdit = (updatedAccount) => {
+        setAccounts(
+            accounts.map(acc => 
+                acc.id === updatedAccount.id ? updatedAccount : acc
+            )
+        );
+    };
+
     return (
         <div>
         <h2>All Accounts</h2>
@@ -27,6 +36,7 @@ function AccountList() {
             key={account.id}
             account={account}
             onDelete={handleDelete}
+            onEdit={handleEdit}
             />
         ))}
         </div>
