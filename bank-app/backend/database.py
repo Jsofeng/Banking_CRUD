@@ -16,5 +16,10 @@ SessionLocal = sessionmaker(
     bind=engine
 )
 
-Base = declarative_base()
+"""
+It links your Python classes to database tables and manages the metadata, 
+allowing you to define database schemas using object-oriented Python code.
+"""
+
+Base = declarative_base() 
 
