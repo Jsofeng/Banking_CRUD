@@ -66,16 +66,16 @@ function AccountCard({ account, onDelete, onEdit }) {
 
 
   return (
-    <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>
-      <h3>{account.owner_name}</h3>
-      <p>Type: {account.account_type}</p>
-      <p>Balance: ${account.balance}</p>
-
-     
-      <button onClick={handleDelete}>Delete Account</button>
-      <button onClick={handleEdit}>Update Balance</button>
+    <div className="card">
+        <h3>{account.owner_name}</h3>
+        <p className={account.account_type}>
+        Type: {account.account_type}
+        </p>
+        <p>Balance: ${account.balance}</p>
+        <button onClick={handleDelete}>Delete Account</button>
+        <button onClick={handleEdit}>Update Balance</button>
     </div>
-  );
+   );
 }
 
 export default AccountCard;

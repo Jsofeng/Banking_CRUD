@@ -3,11 +3,24 @@ import { useState } from "react";
 function AccountForm() {
   const [ownerName, setOwnerName] = useState(""); /* owner_name = current value, setOwnerName = function to change value, useState starts off as an empty string*/
   const [accountType, setAccountType] = useState("chequing");
-  const [balance, setBalance] = useState(0);
+  const [balance, setBalance] = useState("");
+  const [error, setError] = useState("");
 
   /* when user clicks button */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if(ownerName.trim() === "") {
+        setError("Owner name cannot be empty");
+        return;
+    }
+
+    if (Number(balance) < 0) {
+        setError("Balance cannot be negative");
+        return;
+    }
+
+    setError(""); //clear error if valid
 
     /* react uses camelCase & python uses snake_case */ 
     const newAccount = {
@@ -33,6 +46,10 @@ function AccountForm() {
         
         const data = await response.json();
         console.log(data);
+
+        setOwnerName("");
+        setAccountType("chequing");
+        setBalance(0);
     
     } catch (error) {
         alert("Something went wrong while creating the account.");
@@ -44,7 +61,9 @@ function AccountForm() {
   return (
     <form onSubmit={handleSubmit}>
       <h2>Create Account</h2>
-
+      
+      {error && <p className="error">{error}</p>}
+      
       <input
         type="text"
         value={ownerName}
