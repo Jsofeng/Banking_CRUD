@@ -1,0 +1,63 @@
+/* center the whole app */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f6f8;
+  margin: 0;
+  padding: 0;
+}
+
+/* main container */
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* form styling */
+form {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+input, select {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 8px;
+}
+
+/* account card */
+.card {
+  border: 1px solid #ddd;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  background: white;
+}
+
+/* buttons */
+button {
+  margin-right: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+/* account type colors */
+.chequing {
+  color: blue;
+  font-weight: bold;
+}
+
+.savings {
+  color: green;
+  font-weight: bold;
+}
+
+/* error message */
+.error {
+  color: red;
+  margin-bottom: 10px;
+}
