@@ -9,7 +9,7 @@ class Account(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True) #index=True means create an index on this column
     owner_name = Column(String(100))
-    account_type = Column(String(20), default="chequing")
+    account_type = Column(String(20), nullable=False, default="chequing")
     balance = Column(Integer, nullable=False, default=0)
 
     created_at = Column(DateTime, default=datetime.utcnow)
