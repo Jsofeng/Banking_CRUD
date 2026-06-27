@@ -81,17 +81,17 @@ function AccountCard({ account, onDelete, onEdit }) {
                 type="number"
                 placeholder="Amount"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => setAmount(e.target.value)} //when user types in the box amount=setAmount(e.target.value)
             />
             <select
                 value={type}
-                onChange={(e) => setType(e.target.value)}
+                onChange={(e) => setType(e.target.value)} // GRAB transaction_type FIRST then onClick={handelTransaction} connects to backend with choice
             >
                 <option value="deposit">Deposit</option>
                 <option value="withdrawal">Withdraw</option>
             </select>
-            <button onClick={handleTransaction}>
-                Submit Transaction
+            <button onClick={handleTransaction}> 
+                Submit Transaction 
             </button>
             <button onClick={handleDelete}>
                 Delete Account
