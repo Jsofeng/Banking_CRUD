@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from database import SessionLocal, engine, Base
 from models import Account
-from schemas import AccountCreate, AccountResponse, AccountUpdate
+from schemas import AccountCreate, AccountResponse, AccountUpdate, AccountTransaction
 
 Base.metadata.create_all(bind=engine) #Look at all SQLAlchemy models that inherit from Base, and create their tables in Postgres if they don’t exist.
 
@@ -67,6 +67,9 @@ def get_account(id: int, db: Session) -> Account:
             status_code=404,
             detail="Account not found"
         )
+    
+    if account.frozen:
+        raise HTTPException(status_code=400, detail="Cannot make updates to frozen accounts. ")
     
     return account
 
@@ -132,9 +135,6 @@ def delete_account(id: int, db: Session = Depends(get_db)):
 def set_frozen(id: int, db: Session = Depends(get_db)):
     account = get_account(id, db)
 
-    if account.frozen:
-        raise HTTPException(status_code=400, detail="Account already frozen")
-
     account.frozen = True
     db.commit()
     db.refresh(account)
@@ -154,4 +154,32 @@ def set_unfrozen(id: int, db: Session = Depends(get_db)):
     db.refresh(account)
 
     return account
+
+@app.patch("/accounts/{id}/transaction", response_model=AccountResponse)
+def transaction(id, transaction: AccountTransaction, db: Session = Depends(get_db)):
+    account = get_account(id, db)
+
+    if transaction.transaction_type == "deposit":
+        account.balance+=transaction.amount
+
+    elif transaction.transaction_type == "withdrawal":
+        if transaction.amount > account.balance:
+            raise HTTPException(status_code=400, detail="Insufficient funds")
+        
+        account.balance-=transaction.amount
+
+    else:
+        raise HTTPException(status_code=400, detail="Invalid transaction type")
+    
+
+    db.commit()
+    db.refresh(account)
+    
+    return account
+
+
+
+    
+
+
 

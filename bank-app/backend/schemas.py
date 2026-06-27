@@ -35,6 +35,10 @@ class AccountResponse(BaseModel): #what the api sends back
     class Config: #This lets Pydantic read SQLAlchemy objects directly instead of only reading plain dictionaries.
         from_attributes = True
 
+class AccountTransaction(BaseModel):
+    amount: int = Field(ge=0)
+    transaction_type: str
+
 """
 useful for reusability can just do AccountSomething(AccountBase): pass
 
