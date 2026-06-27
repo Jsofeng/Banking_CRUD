@@ -39,6 +39,9 @@ class AccountTransaction(BaseModel):
     amount: int = Field(ge=0)
     transaction_type: str
 
+class AccountFreeze(BaseModel):
+    freeze: bool
+
 """
 useful for reusability can just do AccountSomething(AccountBase): pass
 

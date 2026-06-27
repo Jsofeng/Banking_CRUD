@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from database import SessionLocal, engine, Base
 from models import Account
-from schemas import AccountCreate, AccountResponse, AccountUpdate, AccountTransaction
+from schemas import AccountCreate, AccountResponse, AccountUpdate, AccountTransaction, AccountFreeze
 
 Base.metadata.create_all(bind=engine) #Look at all SQLAlchemy models that inherit from Base, and create their tables in Postgres if they don’t exist.
 
@@ -68,9 +68,6 @@ def get_account(id: int, db: Session) -> Account:
             detail="Account not found"
         )
     
-    if account.frozen:
-        raise HTTPException(status_code=400, detail="Cannot make updates to frozen accounts. ")
-    
     return account
 
 @app.post("/accounts", response_model=AccountResponse)
@@ -131,29 +128,23 @@ def delete_account(id: int, db: Session = Depends(get_db)):
     return {"message": f"Account: {id} deleted successfully"}
 
 
-@app.patch("/accounts/{id}/freeze", response_model=AccountResponse) #allows for partial updates instead of whole object updating like PUT
-def set_frozen(id: int, db: Session = Depends(get_db)):
+@app.patch("/accounts/{id}/set_freeze", response_model=AccountResponse) #allows for partial updates instead of whole object updating like PUT
+def set_frozen(id: int, request: AccountFreeze, db: Session = Depends(get_db)):
     account = get_account(id, db)
 
-    account.frozen = True
+    freeze = request.freeze
+
+    if account.frozen == freeze: #if we did "if account.frozen and freeze" and both are False then it would skip the condition therefore == is a safer & clean approach
+        raise HTTPException(status_code=400, detail="No State Change Needed")
+    
+    account.frozen = freeze
+
+
     db.commit()
     db.refresh(account)
 
     return account
 
-@app.patch("/accounts/{id}/unfreeze", response_model=AccountResponse) #allows for partial updates instead of whole object updating like PUT
-def set_unfrozen(id: int, db: Session = Depends(get_db)):
-    account = get_account(id, db)
-    
-    if not account.frozen:
-        raise HTTPException(status_code=400, detail="Account is already unfrozen")
-
-    
-    account.frozen = False
-    db.commit()
-    db.refresh(account)
-
-    return account
 
 @app.patch("/accounts/{id}/transaction", response_model=AccountResponse)
 def transaction(id, transaction: AccountTransaction, db: Session = Depends(get_db)):
@@ -174,7 +165,7 @@ def transaction(id, transaction: AccountTransaction, db: Session = Depends(get_d
 
     db.commit()
     db.refresh(account)
-    
+
     return account
 
 
