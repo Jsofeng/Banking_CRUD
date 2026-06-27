@@ -1,37 +1,41 @@
 /* { account } is a parameter & which receives ONE Account Object from its parent*/
+import { useState } from "react";
 
 function AccountCard({ account, onDelete, onEdit }) {
+   const [amount, setAmount] = useState("");
+   const [type, setType] = useState("deposit");
 
-   const handleEdit = async () => {
+   const handleTransaction = async () => {
     try {
-        const newBalance = prompt("Enter new balance:");
+        if (!amount) return;
         /* converts newBalance to int -> json string -> backend -> pydantic converts json string to int -> postgres table
             async allows you to compute other stuff and then when that part of the code is finished computing come back to it 
         */
-
-        if (!newBalance) return;
     
-        const response = await fetch(`http://localhost:8000/accounts/${account.id}`, 
+        const response = await fetch(`http://localhost:8000/accounts/${account.id}/transaction`, 
             {
-                method: "PUT",
+                method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                balance: Number(newBalance),
+                    amount: Number(amount),
+                    transaction_type: type,
                 }),
             }    
         );
     
         if (!response.ok) {
-            throw new Error("Failed to update account");
+            throw new Error("Transaction Failed");
         }
 
         const updatedAccount = await response.json();
         onEdit(updatedAccount);
 
+        setAmount("");
+
     } catch (error) {
-        alert("Could not update account. Try again.");
+        alert("Transaction Failed. Try again.");
         console.error(error);
     }
 
@@ -52,7 +56,7 @@ function AccountCard({ account, onDelete, onEdit }) {
                 throw new Error("Failed to delete account");
             }
             
-            const data = response.json();
+            const data = await response.json();
             console.log(data.message);
 
             onDelete(account.id);
@@ -65,17 +69,35 @@ function AccountCard({ account, onDelete, onEdit }) {
     };
 
 
-  return (
-    <div className="card">
-        <h3>{account.owner_name}</h3>
-        <p className={account.account_type}>
-        Type: {account.account_type}
-        </p>
-        <p>Balance: ${account.balance}</p>
-        <button onClick={handleDelete}>Delete Account</button>
-        <button onClick={handleEdit}>Update Balance</button>
-    </div>
-   );
+    return (
+        <div className="card">
+            <h3>{account.owner_name}</h3>
+            <p className={account.account_type}>
+                Type: {account.account_type}
+            </p>
+            <p>Balance: ${account.balance}</p>
+            {/* Transaction UI */}
+            <input
+                type="number"
+                placeholder="Amount"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+            />
+            <select
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+            >
+                <option value="deposit">Deposit</option>
+                <option value="withdrawal">Withdraw</option>
+            </select>
+            <button onClick={handleTransaction}>
+                Submit Transaction
+            </button>
+            <button onClick={handleDelete}>
+                Delete Account
+            </button>
+        </div>
+    );
 }
 
 export default AccountCard;
