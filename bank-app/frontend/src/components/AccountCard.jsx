@@ -40,6 +40,34 @@ function AccountCard({ account, onDelete, onEdit }) {
     }
 
     };
+    //toggle button so that if your account is frozen then you can only unfreeze it vice versa
+    const handleFreeze = async () => {
+        try {
+            const response = await fetch(
+                `http://localhost:8000/accounts/${account.id}/set_freeze`, {
+                    method : "PATCH",
+                    headers : {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        freeze : !account.frozen
+                    }),
+                });
+
+            if (!response.ok) {
+                throw new Error("Failed to update freeze state");
+            }
+
+            const updatedAccount = await response.json();
+            onEdit(updatedAccount);
+
+
+        } catch (error) {
+            console.error(error);
+            alert("Could not update freeze state");
+        }
+    }
 
     // not using async here bc backend delete endpoint returns json so response.json() can read it 
     
@@ -93,6 +121,7 @@ function AccountCard({ account, onDelete, onEdit }) {
             <button onClick={handleTransaction}> 
                 Submit Transaction 
             </button>
+            <button onClick={handleFreeze}>{account.frozen ? "Unfreeze Account" : "Freeze"}</button>
             <button onClick={handleDelete}>
                 Delete Account
             </button>
