@@ -15,3 +15,7 @@ FRONTEND
 - AccountCard - displays one account_type (sends GET /account/{id} req to backend)
 - AccountList - holds all the cards (sends GET /account req to backend)
 
+* AccountList = manager (owns all accounts)
+* AccountCard = worker (shows one account)
+* onEdit = “report back to manager”
+

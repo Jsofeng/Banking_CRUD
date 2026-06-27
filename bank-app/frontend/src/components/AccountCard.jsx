@@ -5,6 +5,8 @@ function AccountCard({ account, onDelete, onEdit }) {
    const [amount, setAmount] = useState("");
    const [type, setType] = useState("deposit");
 
+   //above -> only use const [..., ...] = useState() when user is interacting with it (input fields, dropdowns checkboxes, temporary UI changes)
+   // DO NOT USE IT when the backend owns it (e.g account.frozen, account.balance, account.account_type)
    const handleTransaction = async () => {
     try {
         if (!amount) return;
