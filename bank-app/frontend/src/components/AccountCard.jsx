@@ -32,8 +32,10 @@ function AccountCard({ account, onDelete, onEdit }) {
         }
 
         const updatedAccount = await response.json();
-        onEdit(updatedAccount);
-
+        // <Account onEdit={handleEdit} />
+        // calls parent class (AccountList) and says “Hey parent component, here is the latest version of the account. Update yourself.”
+        onEdit(updatedAccount); 
+        
         setAmount("");
 
     } catch (error) {
