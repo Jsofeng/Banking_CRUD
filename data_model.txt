@@ -7,6 +7,13 @@ Account
 - balance
 - created_at
 
+BACKEND
+AUTHENTICATION & AUTHORIZATION
+
+- python-jose Creates verifies JWT tokens
+- passlib Hashes and verifies passwords
+- python-multipart Lets FastAPI read form data (needed for login)
+
 
 FRONTEND 
 - npm create vite@latest frontend -- --template react 
