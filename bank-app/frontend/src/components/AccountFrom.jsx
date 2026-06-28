@@ -73,7 +73,7 @@ function AccountForm() {
     
       <select
         value={accountType}
-        onChange={(e) => setAccountType(e.target.value)}
+        onChange={(e) => setAccountType(e.target.value)} // accountType is the selected Value to be changed (when the user chooses either accountType onChange it will set accountType to that)
       >
         <option value="chequing">Chequing</option> 
         <option value="savings">Savings</option>
