@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from datetime import datetime
 
 from database import Base
@@ -14,6 +14,8 @@ class Account(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow)
     frozen = Column(Boolean, default=False)
+
+    owner_id = Column(Integer, ForeignKey("users.id"))
 
 
 class User(Base):

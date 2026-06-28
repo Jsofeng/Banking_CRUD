@@ -6,6 +6,7 @@ from database import SessionLocal, engine, Base
 from models import Account
 from schemas import AccountCreate, AccountResponse, AccountUpdate, AccountTransaction, AccountFreeze
 
+Base.metadata.drop_all(bind=engine) #keep this for temporary use
 Base.metadata.create_all(bind=engine) #Look at all SQLAlchemy models that inherit from Base, and create their tables in Postgres if they don’t exist.
 
 """
