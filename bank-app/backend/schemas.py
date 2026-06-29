@@ -16,6 +16,9 @@ class AccountCreate(BaseModel):
 You don’t require all fields
 User can update only what they want
 """
+
+# <---------------- ACCOUNT CLASS ---------------->
+
 class AccountUpdate(BaseModel):
     owner_name: Optional[str] = None
     account_type: Optional[str] = None
@@ -42,6 +45,8 @@ class AccountTransaction(BaseModel):
 class AccountFreeze(BaseModel):
     freeze: bool
 
+# <---------------- USER CLASS ---------------->
+
 class UserCreate(BaseModel):
     username: str = Field(min_length=1)
     email: str 
@@ -53,6 +58,18 @@ class UserResponse(BaseModel):
     email: str
     role: str
     created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# <---------------- TOKEN ---------------->
+
+class Token(BaseModel): #response after login
+    access_token: str
+    token_type: str =  "bearer"
+
+class TokenData(BaseModel): #decoded JWT info OPTIONAL bc token might be invalid * or missing "sub"
+    username: Optional[str] = None
 
 
 
