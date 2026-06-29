@@ -1,5 +1,6 @@
 from passlib.context import CryptContext #Passlib uses a "context" object to handle hashing
 import os
+import hashlib
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from jose import jwt, JWTError
@@ -11,14 +12,16 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
-pwd_context = CryptContext(schemes=["bcrypt"])
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # -------------------------- AUTHENTICATION & AUTHORIZATION --------------------------
 
 def hash_password(password: str):
+    password = hashlib.sha256(password.encode()).hexdigest() # pre-hash to avoid bcrypt 72-byte limit
     return pwd_context.hash(password)
 
 def verify_password(plain: str, hashed: str) -> bool:
+    password = hashlib.sha256(plain.encode()).hexdigest()
     return pwd_context.verify(plain, hashed) #if the password the user typed and the one that got hashed are == then return True
 
 
@@ -30,9 +33,7 @@ def create_access_token(data: dict):
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES) 
     to_encode.update({"exp": expire}) #add the expiry time
 
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithms=ALGORITHM)
-
-    return encoded_jwt
+    return jwt.encode(to_encode, SECRET_KEY, algorithms=ALGORITHM)
 
 def verify_token(token):
     try:
