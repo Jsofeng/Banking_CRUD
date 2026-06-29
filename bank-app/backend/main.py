@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import SessionLocal, engine, Base
-from models import Account
-from schemas import AccountCreate, AccountResponse, AccountUpdate, AccountTransaction, AccountFreeze
+from models import Account, User
+from schemas import AccountCreate, AccountResponse, AccountUpdate, AccountTransaction, AccountFreeze, UserCreate, UserResponse, Token, TokenData
+from auth import hash_password
 
 Base.metadata.drop_all(bind=engine) #keep this for temporary use
 Base.metadata.create_all(bind=engine) #Look at all SQLAlchemy models that inherit from Base, and create their tables in Postgres if they don’t exist.
@@ -168,6 +169,27 @@ def transaction(id, transaction: AccountTransaction, db: Session = Depends(get_d
     db.refresh(account)
 
     return account
+
+@app.post("/register", response_model=UserResponse)
+
+def register(user: UserCreate, db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter(User.username == user.username).first()
+
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username already exists")
+    
+    hashed_pw = hash_password(user.password)
+
+    new_user = User(
+        username=user.username,
+        email=user.email,
+        hashed_password=hashed_pw,
+        role="user"
+    )
+    db.add(new_user)
+    db.commit()
+    
+    return new_user
 
 
 
