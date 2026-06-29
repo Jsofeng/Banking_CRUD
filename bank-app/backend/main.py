@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import OAuth2AuthorizationCodeBearer, 
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -55,7 +55,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-oauth2_scheme = OAuth2AuthorizationCodeBearer(tokenUrl="login") #Look for a JWT token in the Authorization header -> frontend sends -> Authorization: Bearer <token>
+oauth2_scheme = (OAuth2PasswordBearer(tokenUrl="login")) #Look for a JWT token in the Authorization header -> frontend sends -> Authorization: Bearer <token>
 
 
 def get_db():
@@ -211,7 +211,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
 @app.post("/login", response_model=Token)
 
-def login(db: Session = Depends(get_db), form_data: OAuth2AuthorizationCodeBearer = Depends()): # form_data: OAuth2AuthorizationCodeBearer = Depends() automatically reads username=... password=...
+def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()): # form_data: OAuth2PasswordRequestForm = Depends() automatically reads username=... password=...
     user = db.query(User).filter(User.username == form_data.username).first() #basically SELECT * FROM USERS WHERE username = form_data.username LIMIT 1
 
     if not user:
