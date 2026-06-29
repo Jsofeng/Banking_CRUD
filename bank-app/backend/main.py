@@ -1,12 +1,12 @@
 from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import OAuth2AuthorizationCodeBearer
+from fastapi.security import OAuth2AuthorizationCodeBearer, 
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import SessionLocal, engine, Base
 from models import Account, User
 from schemas import AccountCreate, AccountResponse, AccountUpdate, AccountTransaction, AccountFreeze, UserCreate, UserResponse, Token, TokenData
-from auth import hash_password, verify_password, create_access_token
+from auth import hash_password, verify_password, create_access_token, verify_token
 
 Base.metadata.drop_all(bind=engine) #keep this for temporary use
 Base.metadata.create_all(bind=engine) #Look at all SQLAlchemy models that inherit from Base, and create their tables in Postgres if they don’t exist.
@@ -55,12 +55,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+oauth2_scheme = OAuth2AuthorizationCodeBearer(tokenUrl="login") #Look for a JWT token in the Authorization header -> frontend sends -> Authorization: Bearer <token>
+
+
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    username = verify_token(token)
+
+    user = db.query(User).filter(User.username == username).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token or user not found"
+        )
+    
+    return user
+
 
 #HELPER FUNCTION
 def get_account(id: int, db: Session) -> Account:
