@@ -22,7 +22,7 @@ def hash_password(password: str):
 
 def verify_password(plain: str, hashed: str) -> bool:
     password = hashlib.sha256(plain.encode()).hexdigest()
-    return pwd_context.verify(plain, hashed) #if the password the user typed and the one that got hashed are == then return True
+    return pwd_context.verify(password, hashed) #if the password the user typed and the one that got hashed are == then return True
 
 
 # -------------------------- JWT TOKEN  --------------------------
