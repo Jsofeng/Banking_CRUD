@@ -42,6 +42,20 @@ class AccountTransaction(BaseModel):
 class AccountFreeze(BaseModel):
     freeze: bool
 
+class UserCreate(BaseModel):
+    username: str = Field(min_length=1)
+    email: str 
+    password: str
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+    role: str
+    created_at: datetime
+
+
+
 """
 useful for reusability can just do AccountSomething(AccountBase): pass
 
