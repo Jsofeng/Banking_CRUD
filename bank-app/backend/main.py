@@ -55,6 +55,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+"""
+oauth2_scheme = security guard at the door
+
+He:
+- checks for ID (token)
+- pulls it out of your header
+- hands it to your code
+"""
+
 oauth2_scheme = (OAuth2PasswordBearer(tokenUrl="login")) #Look for a JWT token in the Authorization header -> frontend sends -> Authorization: Bearer <token>
 
 
