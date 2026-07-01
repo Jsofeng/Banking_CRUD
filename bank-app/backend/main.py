@@ -8,7 +8,7 @@ from models import Account, User
 from schemas import AccountCreate, AccountResponse, AccountUpdate, AccountTransaction, AccountFreeze, UserCreate, UserResponse, Token, TokenData
 from auth import hash_password, verify_password, create_access_token, verify_token
 
-Base.metadata.drop_all(bind=engine) #keep this for temporary use
+# Base.metadata.drop_all(bind=engine) #keep this for temporary use
 Base.metadata.create_all(bind=engine) #Look at all SQLAlchemy models that inherit from Base, and create their tables in Postgres if they don’t exist.
 
 """
@@ -91,7 +91,7 @@ def get_account(id: int, db: Session) -> Account:
     return account
 
 @app.post("/accounts", response_model=AccountResponse)
-def create_account(accounts: AccountCreate, db: Session = Depends(get_db)):
+def create_account(accounts: AccountCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     new_account = Account(
         owner_name = accounts.owner_name,
         account_type = accounts.account_type,
@@ -105,18 +105,18 @@ def create_account(accounts: AccountCreate, db: Session = Depends(get_db)):
     return new_account
 
 @app.get("/accounts", response_model=list[AccountResponse])
-def get_accounts(db: Session = Depends(get_db)):
+def get_accounts(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     accounts = db.query(Account).all() #“SELECT * FROM accounts”
     return accounts
 
 @app.get("/accounts/{id}", response_model=AccountResponse)
-def get_account_id(id: int, db: Session = Depends(get_db)):
+def get_account_id(id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     account = get_account(id, db)
     
     return account
 
 @app.put("/accounts/{id}", response_model=AccountResponse)
-def update_account(id: int, updated_data: AccountUpdate, db: Session = Depends(get_db)):
+def update_account(id: int, updated_data: AccountUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     
     account = get_account(id, db)
 
@@ -138,7 +138,7 @@ def update_account(id: int, updated_data: AccountUpdate, db: Session = Depends(g
     return account
 
 @app.delete("/accounts/{id}")
-def delete_account(id: int, db: Session = Depends(get_db)):
+def delete_account(id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     
     account = get_account(id, db)
 
@@ -149,7 +149,7 @@ def delete_account(id: int, db: Session = Depends(get_db)):
 
 
 @app.patch("/accounts/{id}/set_freeze", response_model=AccountResponse) #allows for partial updates instead of whole object updating like PUT
-def set_frozen(id: int, request: AccountFreeze, db: Session = Depends(get_db)):
+def set_frozen(id: int, request: AccountFreeze, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     account = get_account(id, db)
 
     freeze = request.freeze
@@ -167,7 +167,7 @@ def set_frozen(id: int, request: AccountFreeze, db: Session = Depends(get_db)):
 
 
 @app.patch("/accounts/{id}/transaction", response_model=AccountResponse)
-def transaction(id, transaction: AccountTransaction, db: Session = Depends(get_db)):
+def transaction(id, transaction: AccountTransaction, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     account = get_account(id, db)
 
     if transaction.transaction_type == "deposit":
@@ -196,6 +196,8 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
     
+
+    
     hashed_pw = hash_password(user.password)
 
     new_user = User(
@@ -206,6 +208,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     )
     db.add(new_user)
     db.commit()
+    db.refresh(new_user)
 
     return new_user
 
