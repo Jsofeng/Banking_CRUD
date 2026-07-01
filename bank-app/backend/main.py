@@ -167,7 +167,7 @@ def set_frozen(id: int, request: AccountFreeze, db: Session = Depends(get_db), c
 
 
 @app.patch("/accounts/{id}/transaction", response_model=AccountResponse)
-def transaction(id, transaction: AccountTransaction, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def transaction(id: int, transaction: AccountTransaction, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     account = get_account(id, db)
 
     if transaction.transaction_type == "deposit":
