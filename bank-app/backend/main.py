@@ -78,6 +78,13 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     
     return user
 
+def require_admin(current_user: User = Depends(get_current_user)):
+    
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    return current_user
+        
 
 #HELPER FUNCTION
 def get_account(id: int, db: Session) -> Account:
@@ -235,6 +242,10 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
         "access_token": access_token,
         "token_type": "bearer"
     }
+
+@app.get("/admin/accounts", response_model=list[AccountResponse])
+def admin_dashboard(db: Session = Depends(get_db), current_user: User = Depends(require_admin)): # Depends(require_admin) means this function can only run when this is successful
+    return db.query(Account).all()
 
 
 
