@@ -95,7 +95,8 @@ def create_account(accounts: AccountCreate, db: Session = Depends(get_db), curre
     new_account = Account(
         owner_name = accounts.owner_name,
         account_type = accounts.account_type,
-        balance = accounts.balance
+        balance = accounts.balance,
+        owner_id = current_user.id
     )
 
     db.add(new_account)
@@ -169,6 +170,9 @@ def set_frozen(id: int, request: AccountFreeze, db: Session = Depends(get_db), c
 @app.patch("/accounts/{id}/transaction", response_model=AccountResponse)
 def transaction(id: int, transaction: AccountTransaction, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     account = get_account(id, db)
+
+    if account.frozen:
+        raise HTTPException(status_code=400, detail="Account is currently frozen")
 
     if transaction.transaction_type == "deposit":
         account.balance+=transaction.amount
