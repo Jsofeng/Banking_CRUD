@@ -107,7 +107,7 @@ def create_account(accounts: AccountCreate, db: Session = Depends(get_db), curre
 
 @app.get("/accounts", response_model=list[AccountResponse])
 def get_accounts(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    accounts = db.query(Account).all() #“SELECT * FROM accounts”
+    accounts = db.query(Account).filter(Account.owner_id == current_user.id).all() #“SELECT * FROM accounts INNER JOIN ON accounts.owner_id = current_user.id (Now each user only sees their own accounts)
     return accounts
 
 @app.get("/accounts/{id}", response_model=AccountResponse)
