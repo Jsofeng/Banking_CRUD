@@ -181,7 +181,6 @@ def transaction(id, transaction: AccountTransaction, db: Session = Depends(get_d
 
     else:
         raise HTTPException(status_code=400, detail="Invalid transaction type")
-    
 
     db.commit()
     db.refresh(account)
@@ -192,11 +191,14 @@ def transaction(id, transaction: AccountTransaction, db: Session = Depends(get_d
 
 def register(user: UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.username == user.username).first()
+    existing_email = db.query(User).filter(User.email == user.email).first()
 
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
     
-
+    if existing_email:
+        raise HTTPException(status_code=400, detail="Email already exists")
+    
     
     hashed_pw = hash_password(user.password)
 
