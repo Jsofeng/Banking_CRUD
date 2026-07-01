@@ -26,3 +26,20 @@ FRONTEND
 * AccountCard = worker (shows one account)
 * onEdit = “report back to manager”
 
+step 1:
+- register
+
+step2
+- login
+- get access_token
+
+step3
+- top right click authorize
+- enter user & password 
+
+
+
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdHJpbmciLCJleHAiOjE3ODI4NzY1NzV9.qEKDPakbPAnZTXGnVRcjLKilSKmzlUgYBkJiuwjcexw",
+  "token_type": "bearer"
+}
