@@ -91,7 +91,7 @@ function AccountCard({ account, onDelete, onEdit }) {
             const data = await response.json();
             console.log(data.message);
 
-            onDelete(account.id);
+            onDelete(account.id); // connects to AccountList -> handleDelete
 
         } catch (error) {
             alert("Something went wrong while deleting the account.");

@@ -15,7 +15,7 @@ function AccountList() {
             .catch(error => console.error(error)); 
     }, []);
 
-    // 2. Delete handler (remove from UI after backend delete)
+    // 2. Delete handler updates accountlist UI in frontend by removing that specific account then deletes it from the database
 
     const handleDelete = (id) => {
         setAccounts(accounts.filter((acc) => acc.id !== id));
