@@ -3,8 +3,8 @@ export function authFetch(url, options = {}) {
 
     const isFormData = options.body instanceof FormData;
 
-    //auto fetches the url with added Authorization 
-
+    //auto fetches the url with added Authorization -> requests that require a logged-in user thats why login & register don't need it 
+ 
     /*
     Without authFetch:
 
