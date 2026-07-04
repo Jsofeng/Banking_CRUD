@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import AccountCard from "./AccountCard";
 import { authFetch } from "../utils/authFetch";
+import Logout from "./Logout";
 
 function AccountList() {
     const [accounts, setAccounts] = useState([]);
@@ -37,18 +38,21 @@ function AccountList() {
     };
 
     return (
-        <div>
-        <h2>All Accounts</h2>
+    <div>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <h2>All Accounts</h2>
+            <Logout />
+        </div>
         {accounts.map((account) => (
             <AccountCard
-            key={account.id}
-            account={account}
-            onDelete={handleDelete}
-            onEdit={handleEdit}
+                key={account.id}
+                account={account}
+                onDelete={handleDelete}
+                onEdit={handleEdit}
             />
         ))}
-        </div>
-    );
+    </div>
+);
 }
 
 export default AccountList
