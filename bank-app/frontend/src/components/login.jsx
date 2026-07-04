@@ -1,8 +1,9 @@
 import { useState } from "react"
-
+import { useNavigate } from "react-router-dom";
 function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault(); //normally the browser would auto reload but this allows us to apply our own custom react code to handle it
@@ -24,6 +25,9 @@ function Login() {
 
             const data = await response.json();
             localStorage.setItem("token", data.access_token); //Now the browser stores it even if the page is refreshed. 
+            
+            // redirect after to user's accounts after successful login
+            navigate("/accounts");
 
         } catch (error) {
             alert("Login failed. Please check your username and password")

@@ -16,7 +16,7 @@ export function authFetch(url, options = {}) {
 
     You give the waiter your “membership card” once, and they handle it for every order.
     */
-   
+    
     return fetch(url, {
         ...options,
         headers: {

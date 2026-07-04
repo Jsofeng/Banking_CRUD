@@ -10,25 +10,25 @@ function Register() {
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
-        
-        if (username.trim() == "") {
+        e.preventDefault();
+
+        if (!username.trim()) {
             setError("Username cannot be empty");
             return;
         }
 
-        if (email.trim() == "") {
+        if (!email.trim()) {
             setError("Email cannot be empty");
             return;
         }
 
-        if (password.trim() == "") {
+        if (!password.trim()) {
             setError("Password cannot be empty");
             return;
         }
 
         setError("");
-        
+
         const newUser = {
             username,
             email,
@@ -43,21 +43,21 @@ function Register() {
                 },
                 body: JSON.stringify(newUser),
             });
-            
+
             if (!response.ok) {
-                throw new Error("Invalid Username or Password")
+                setError("Registration failed (username may already exist)");
+                return;
             }
 
-            const data = await response.json()
-            console.log(data)
+            await response.json();
 
             alert("Registration successful! Please log in.");
-            
+
             navigate("/login");
 
         } catch (error) {
-            setError("Registration failed.");
             console.error(error);
+            setError("Server error. Please try again.");
         }
     };
 
@@ -67,30 +67,28 @@ function Register() {
 
             {error && <p className="error">{error}</p>}
 
-            <input 
+            <input
                 type="text"
                 placeholder="Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
             />
 
-            <input 
+            <input
                 type="text"
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
             />
-    
-            <input 
-                type="text"
+
+            <input
+                type="password"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
             />
 
-            <button type="submit">
-                Register
-            </button>
+            <button type="submit">Register</button>
         </form>
     );
 }
