@@ -4,6 +4,7 @@ import Login from "./components/login";
 import Register from "./components/register";
 import AccountList from "./components/AccountList";
 import AccountForm from "./components/AccountForm";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
     return (
@@ -16,10 +17,12 @@ function App() {
                 <Route
                     path="/accounts"
                     element={
-                        <>
-                            <AccountForm />
-                            <AccountList />
-                        </>
+                        <PrivateRoute>
+                            <>
+                                <AccountForm />
+                                <AccountList />
+                            </>
+                        </PrivateRoute>
                     }
                 />
             </Routes>
