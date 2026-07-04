@@ -1,5 +1,6 @@
 /* { account } is a parameter & which receives ONE Account Object from its parent*/
 import { useState } from "react";
+import { authFetch } from "../utils/authFetch";
 
 function AccountCard({ account, onDelete, onEdit }) {
    const [amount, setAmount] = useState("");
@@ -14,7 +15,7 @@ function AccountCard({ account, onDelete, onEdit }) {
             async allows you to compute other stuff and then when that part of the code is finished computing come back to it 
         */
     
-        const response = await fetch(`http://localhost:8000/accounts/${account.id}/transaction`, 
+        const response = await authFetch(`http://localhost:8000/accounts/${account.id}/transaction`, 
             {
                 method: "PATCH",
                 headers: {
@@ -47,7 +48,7 @@ function AccountCard({ account, onDelete, onEdit }) {
     //toggle button so that if your account is frozen then you can only unfreeze it vice versa
     const handleFreeze = async () => {
         try {
-            const response = await fetch(
+            const response = await authFetch(
                 `http://localhost:8000/accounts/${account.id}/set_freeze`, {
                     method : "PATCH",
                     headers : {
@@ -77,7 +78,7 @@ function AccountCard({ account, onDelete, onEdit }) {
     
     const handleDelete = async () => {
         try {
-            const response = await fetch(
+            const response = await authFetch(
                 `http://localhost:8000/accounts/${account.id}`, 
                 {
                     method: "DELETE"

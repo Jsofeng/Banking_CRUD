@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AccountCard from "./AccountCard";
-
+import { authFetch } from "../utils/authFetch";
 
 function AccountList() {
     const [accounts, setAccounts] = useState([]);
@@ -9,8 +9,14 @@ function AccountList() {
     // can only use then when it's not async/await fetch
     // what you receive after fetching take response.json -> put that data into setAccounts 
     useEffect(() => {
-        fetch("http://localhost:8000/accounts")
-            .then(response => response.json()) // Convert JSON text → JavaScript objects
+        authFetch("http://localhost:8000/accounts")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to fetch accounts");
+                }
+                return response.json()
+            }) // Convert JSON text → JavaScript objects
+
             .then(data => setAccounts(data))   // Store the accounts in state
             .catch(error => console.error(error)); 
     }, []);
