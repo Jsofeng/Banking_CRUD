@@ -97,7 +97,7 @@ def require_admin(current_user: User = Depends(get_current_user)):
 
 #HELPER FUNCTION
 def get_account(id: int, db: Session, current_user: User) -> Account:
-    account = db.query(Account).filter(Account.id == id, Account.owner_id == current_user.id).first()
+    account = db.query(Account).filter(Account.id == id, Account.owner_id == current_user.id).first() #ensures current id matches Account.id and foreign key matches User.id
     if not account:
         raise HTTPException(
             status_code=404,
