@@ -96,8 +96,8 @@ def require_admin(current_user: User = Depends(get_current_user)):
         
 
 #HELPER FUNCTION
-def get_account(id: int, db: Session) -> Account:
-    account = db.query(Account).filter(Account.id == id).first()
+def get_account(id: int, db: Session, current_user: User) -> Account:
+    account = db.query(Account).filter(Account.id == id, Account.owner_id == current_user.id).first()
     if not account:
         raise HTTPException(
             status_code=404,
@@ -128,14 +128,14 @@ def get_accounts(db: Session = Depends(get_db), current_user: User = Depends(get
 
 @app.get("/accounts/{id}", response_model=AccountResponse)
 def get_account_id(id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    account = get_account(id, db)
+    account = get_account(id, db current_user)
     
     return account
 
 @app.put("/accounts/{id}", response_model=AccountResponse)
 def update_account(id: int, updated_data: AccountUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     
-    account = get_account(id, db)
+    account = get_account(id, db, current_user)
 
     if updated_data.owner_name is not None:
         account.owner_name = updated_data.owner_name
@@ -157,7 +157,7 @@ def update_account(id: int, updated_data: AccountUpdate, db: Session = Depends(g
 @app.delete("/accounts/{id}")
 def delete_account(id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     
-    account = get_account(id, db)
+    account = get_account(id, db, current_user)
 
     db.delete(account)
     db.commit()
@@ -167,7 +167,7 @@ def delete_account(id: int, db: Session = Depends(get_db), current_user: User = 
 
 @app.patch("/accounts/{id}/set_freeze", response_model=AccountResponse) #allows for partial updates instead of whole object updating like PUT
 def set_frozen(id: int, request: AccountFreeze, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    account = get_account(id, db)
+    account = get_account(id, db, current_user)
 
     freeze = request.freeze
 
@@ -183,9 +183,9 @@ def set_frozen(id: int, request: AccountFreeze, db: Session = Depends(get_db), c
     return account
 
 
-@app.patch("/accounts/{id}/transaction", response_model=AccountResponse)
+@app.patch("/accounts/{id}/transaction", response_model=TransactionResponse)
 def transaction(id: int, transaction: AccountTransaction, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    account = get_account(id, db)
+    account = get_account(id, db, current_user)
 
     if account.frozen:
         raise HTTPException(status_code=400, detail="Account is currently frozen")
@@ -202,14 +202,24 @@ def transaction(id: int, transaction: AccountTransaction, db: Session = Depends(
     else:
         raise HTTPException(status_code=400, detail="Invalid transaction type")
 
+    new_transaction = Transaction(
+        account_id=account.id,
+        transaction_type=transaction.transaction_type,
+        amount=transaction.amount
+    )
+
+    db.add(new_transaction)
     db.commit()
     db.refresh(account)
-
-    return account
+    
+    return new_transaction
 
 @app.get("/accounts/{id}/transaction", response_model=list[TransactionResponse])
 def get_transactions(id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    return db.query(Transaction).filter(Transaction.account_id == id).all()
+    account = get_account(id, db, current_user)
+    
+    transactions = db.query(Transaction).filter(Transaction.account_id == account.id).all()    
+    return transactions
 
 @app.post("/register", response_model=UserResponse)
 
@@ -258,7 +268,8 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
 
 @app.get("/admin/accounts", response_model=list[AccountResponse])
 def admin_dashboard(db: Session = Depends(get_db), current_user: User = Depends(require_admin)): # Depends(require_admin) means this function can only run when this is successful
-    return db.query(Account).all()
+    accounts = db.query(Account).all()
+    return accounts
 
 
 
