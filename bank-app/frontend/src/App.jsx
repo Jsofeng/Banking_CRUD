@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Login from "./components/login";
-import Register from "./components/register";
+import Login from "./components/Temp";
+import Register from "./components/TempR";
 import AccountList from "./components/AccountList";
 import AccountForm from "./components/AccountForm";
 import PrivateRoute from "./components/PrivateRoute";
