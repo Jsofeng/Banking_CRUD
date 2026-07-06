@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey
 from datetime import datetime
 
 from database import Base
@@ -34,4 +34,15 @@ class User(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class Transactions(Base):
+    __tablename__ = "transactions"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    account_id = Column(Integer, ForeignKey("accounts.id"))
+    transaction_type = Column(String) #deposit or withdrawl for now
+    amount = Column(Float)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    
 
