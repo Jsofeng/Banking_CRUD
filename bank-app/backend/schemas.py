@@ -42,6 +42,16 @@ class AccountTransaction(BaseModel):
     amount: int = Field(ge=0)
     transaction_type: str
 
+class TransactionResponse(BaseModel):
+    id: int
+    account_id: int
+    transaction_type: str
+    amount: float
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
 class AccountFreeze(BaseModel):
     freeze: bool
 
