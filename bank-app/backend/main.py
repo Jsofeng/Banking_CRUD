@@ -128,7 +128,7 @@ def get_accounts(db: Session = Depends(get_db), current_user: User = Depends(get
 
 @app.get("/accounts/{id}", response_model=AccountResponse)
 def get_account_id(id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    account = get_account(id, db current_user)
+    account = get_account(id, db, current_user)
     
     return account
 
