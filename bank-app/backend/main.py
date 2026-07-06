@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import SessionLocal, engine, Base
-from models import Account, User
-from schemas import AccountCreate, AccountResponse, AccountUpdate, AccountTransaction, AccountFreeze, UserCreate, UserResponse, Token, TokenData
+from models import Account, User, Transaction
+from schemas import AccountCreate, AccountResponse, AccountUpdate, AccountTransaction, AccountFreeze, UserCreate, UserResponse, Token, TokenData, TransactionResponse
 from auth import hash_password, verify_password, create_access_token, verify_token
 
 #Base.metadata.drop_all(bind=engine) #keep this for temporary use
@@ -206,6 +206,10 @@ def transaction(id: int, transaction: AccountTransaction, db: Session = Depends(
     db.refresh(account)
 
     return account
+
+@app.get("/accounts/{id}/transaction", response_model=list[TransactionResponse])
+def get_transactions(id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return db.query(Transaction).filter(Transaction.account_id == id).all()
 
 @app.post("/register", response_model=UserResponse)
 
