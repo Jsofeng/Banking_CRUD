@@ -81,14 +81,3 @@ class Token(BaseModel): #response after login
 class TokenData(BaseModel): #decoded JWT info OPTIONAL bc token might be invalid * or missing "sub"
     username: Optional[str] = None
 
-
-
-"""
-useful for reusability can just do AccountSomething(AccountBase): pass
-
-class AccountBase(BaseModel):
-    owner_name: str
-    account_type: str = "chequing"
-    balance: int
-
-"""
