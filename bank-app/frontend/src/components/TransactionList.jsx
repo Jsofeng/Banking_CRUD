@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { authFetch } from "../utils/authFetch";
 
+// export default functionname = import Class from Path 
+// export function functionName() = imporrt { Class } from Path
+
 function TransactionList({ accountId }) {
     const [transactions, setTransactions] = useState([]);
     
