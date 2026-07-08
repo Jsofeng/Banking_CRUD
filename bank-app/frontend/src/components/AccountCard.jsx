@@ -1,10 +1,12 @@
 /* { account } is a parameter & which receives ONE Account Object from its parent*/
 import { useState } from "react";
 import { authFetch } from "../utils/authFetch";
+import TransactionList from "./TransactionList";
 
 function AccountCard({ account, onDelete, onEdit }) {
    const [amount, setAmount] = useState("");
    const [type, setType] = useState("deposit");
+   const [showTransactions, setShowTransactions] = useState(false);
 
    //above -> only use const [..., ...] = useState() when user is interacting with it (input fields, dropdowns checkboxes, temporary UI changes)
    // DO NOT USE IT when the backend owns it (e.g account.frozen, account.balance, account.account_type)
@@ -126,10 +128,17 @@ function AccountCard({ account, onDelete, onEdit }) {
             <button onClick={handleTransaction}> 
                 Submit Transaction 
             </button>
+            
+            <button onClick={() => setShowTransactions(!showTransactions)}>{showTransactions ? "Hide Transaction History" : "Transaction History"}</button> 
             <button onClick={handleFreeze}>{account.frozen ? "Unfreeze Account" : "Freeze"}</button>
             <button onClick={handleDelete}>
                 Delete Account
             </button>
+
+            {showTransactions && (
+                <TransactionList accountId={account.id} />
+            )}
+
         </div>
     );
 }
