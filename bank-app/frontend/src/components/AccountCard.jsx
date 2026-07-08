@@ -136,7 +136,7 @@ function AccountCard({ account, onDelete, onEdit }) {
             </button>
 
             {showTransactions && (
-                <TransactionList accountId={account.id} />
+                <TransactionList accountId={account.id} /> // “Only render <TransactionList /> if showTransactions is true.”
             )}
 
         </div>
