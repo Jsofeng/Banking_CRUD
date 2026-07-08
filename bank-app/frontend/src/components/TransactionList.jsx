@@ -5,7 +5,7 @@ function TransactionList({ accountId }) {
     const [transactions, setTransactions] = useState([]);
     
     useEffect(() => {
-        authFetch(`http://localhost:8000/accounts/${accountId}/transactions`)
+        authFetch(`http://localhost:8000/accounts/${accountId}/transaction`)
             .then((response) => {
                 if (!response.ok) {
                     throw new Error("Failed to fetch transactions");
