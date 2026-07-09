@@ -92,3 +92,33 @@ Create new container
 Database is still there
 
 depends_on: tells Docker “Start PostgreSQL before starting FastAPI.”
+
+
+
+
+why setup docker?
+
+Your Mac
+│
+└── Docker
+    │
+    ├── bank-backend container
+    │       └── FastAPI + SQLAlchemy
+    │
+    └── bank-db container
+            └── PostgreSQL 17
+            └── database: bank_app
+
+now when someone clones your repo and runs docker compose up and they get the exact same environment.
+
+DATABASE_URL=postgresql://jonathanzhao@localhost:5432/bank_app means run postgres on your on local computer
+DATABASE_URL=postgresql://postgres:password@db:5432/bank_app means 
+
+postgresql://postgres:password@db:5432/bank_app
+│          │       │        │    │      │
+│          │       │        │    │      └── Database name
+│          │       │        │    └───────── Port
+│          │       │        └────────────── Database address (host)
+│          │       └─────────────────────── Password
+│          └─────────────────────────────── Username
+└────────────────────────────────────────── Database type
