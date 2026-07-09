@@ -1,0 +1,94 @@
+
+DOCKER 
+
+step1: pip freeze > requirements ../backend
+pip freeze outputs every installed package and its exact version. The > redirects that output into a file instead of printing it to the terminal.
+
+bank-app/
+├── backend/
+│   ├── Dockerfile        ← recipe for your FastAPI app
+├── docker-compose.yml    ← orchestrates FastAPI + PostgreSQL together
+└── .env                  ← secret config values (DB password, secret key)
+
+Instruction     What it does                                  Example 
+FROM        Start from a base image                         FROM python:3.11
+WORKDIR     Set the working directory inside the container  WORKDIR /app
+COPY        Copy files from your machine into the container  COPY . .
+RUN         Execute a shell command at build time           RUN pip install ...
+CMD         The command that runs when the container starts CMD ["uvicorn", ...]
+
+docker-compose.yml defines: allows both FastAPI & PostgreSQL to talk to eachother
+├── service: db        ← a PostgreSQL container
+└── service: backend   ← your FastAPI container
+
+build — point it to the backend/ folder where your Dockerfile lives
+ports — map your machine's port 8000 to the container's port 8000: "8000:8000"
+depends_on — tell it to wait for db to start before starting FastAPI
+env_file — point it to your .env file for secrets
+
+Also add a volume so your data persists even if the container restarts. Without this, every restart wipes the database:
+volumes:
+  - postgres_data:/var/lib/postgresql/data
+
+
+At the bottom of docker-compose.yml, declare the named volume you referenced in the db service:
+volumes:
+  postgres_data:
+This tells Docker to create and manage a persistent storage volume.
+
+
+services: defines all containers your application needs
+
+Right now you have:
+
+* PostgreSQL
+* FastAPI
+
+Later you could add:
+
+* React
+* Redis
+* Nginx
+
+db: the name of your container 
+
+image: Instead of writing your own PostgreSQL Dockerfile, Docker downloads the official PostgreSQL image from Docker Hub.
+
+environment: environment variables passed into postgres
+
+This tells PostgreSQL:
+
+* create a user called postgres
+* password is password
+* automatically create a database called bank_app
+
+ports: (format "host:container")
+Your Mac
+
+localhost:5432
+
+        │
+
+        ▼
+
+PostgreSQL Container
+
+5432
+
+volumes: 
+  - postgres_data:/var/lib/postgresql/data
+
+  where postgres stores all tables 
+
+with it 
+Delete container
+
+↓
+
+Create new container
+
+↓
+
+Database is still there
+
+depends_on: tells Docker “Start PostgreSQL before starting FastAPI.”
