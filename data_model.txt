@@ -54,3 +54,10 @@ bank-app/
 │   ├── Dockerfile        ← recipe for your FastAPI app
 ├── docker-compose.yml    ← orchestrates FastAPI + PostgreSQL together
 └── .env                  ← secret config values (DB password, secret key)
+
+Instruction     What it does                                  Example 
+FROM        Start from a base image                         FROM python:3.11
+WORKDIR     Set the working directory inside the container  WORKDIR /app
+COPY        Copy files from your machine into the container  COPY . .
+RUN         Execute a shell command at build time           RUN pip install ...
+CMD         The command that runs when the container starts CMD ["uvicorn", ...]
