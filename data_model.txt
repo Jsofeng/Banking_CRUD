@@ -43,3 +43,14 @@ step3
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdHJpbmciLCJleHAiOjE3ODI4NzY1NzV9.qEKDPakbPAnZTXGnVRcjLKilSKmzlUgYBkJiuwjcexw",
   "token_type": "bearer"
 }
+
+DOCKER 
+
+step1: pip freeze > requirements ../backend
+pip freeze outputs every installed package and its exact version. The > redirects that output into a file instead of printing it to the terminal.
+
+bank-app/
+├── backend/
+│   ├── Dockerfile        ← recipe for your FastAPI app
+├── docker-compose.yml    ← orchestrates FastAPI + PostgreSQL together
+└── .env                  ← secret config values (DB password, secret key)
