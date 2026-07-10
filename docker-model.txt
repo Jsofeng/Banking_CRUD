@@ -122,3 +122,6 @@ postgresql://postgres:password@db:5432/bank_app
 │          │       └─────────────────────── Password
 │          └─────────────────────────────── Username
 └────────────────────────────────────────── Database type
+
+
+RUN docker exec -it bank-db psql -U postgres -d bank_app 
