@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { authFetch } from "../utils/authFetch";
+import { API_URL } from "../config";
 
 // export default functionname = import Class from Path 
 // export function functionName() = imporrt { Class } from Path
@@ -8,7 +9,7 @@ function TransactionList({ accountId }) {
     const [transactions, setTransactions] = useState([]);
     
     useEffect(() => {
-        authFetch(`http://localhost:8000/accounts/${accountId}/transaction`)
+        authFetch(`${API_URL}/accounts/${accountId}/transaction`)
             .then((response) => {
                 if (!response.ok) {
                     throw new Error("Failed to fetch transactions");

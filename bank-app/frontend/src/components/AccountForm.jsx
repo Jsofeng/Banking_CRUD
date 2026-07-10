@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { authFetch } from "../utils/authFetch";
+import { API_URL } from "../config";
 
 function AccountForm() {
   const [ownerName, setOwnerName] = useState(""); /* owner_name = current value, setOwnerName = function to change value, useState starts off as an empty string*/
@@ -31,7 +32,7 @@ function AccountForm() {
     };
 
     try {
-        const response = await authFetch("http://localhost:8000/accounts", 
+        const response = await authFetch(`${API_URL}/accounts`, 
             {
                 method: "POST",
                 headers: {

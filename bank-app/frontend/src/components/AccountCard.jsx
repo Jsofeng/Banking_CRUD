@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { authFetch } from "../utils/authFetch";
 import TransactionList from "./TransactionList";
+import { API_URL } from "../config";
 
 function AccountCard({ account, onDelete, onEdit }) {
    const [amount, setAmount] = useState("");
@@ -17,7 +18,7 @@ function AccountCard({ account, onDelete, onEdit }) {
             async allows you to compute other stuff and then when that part of the code is finished computing come back to it 
         */
     
-        const response = await authFetch(`http://localhost:8000/accounts/${account.id}/transaction`, 
+        const response = await authFetch(`${API_URL}/accounts/${account.id}/transaction`, 
             {
                 method: "PATCH",
                 headers: {
@@ -51,7 +52,7 @@ function AccountCard({ account, onDelete, onEdit }) {
     const handleFreeze = async () => {
         try {
             const response = await authFetch(
-                `http://localhost:8000/accounts/${account.id}/set_freeze`, {
+                `${API_URL}/accounts/${account.id}/set_freeze`, {
                     method : "PATCH",
                     headers : {
                         "Content-Type": "application/json"
@@ -81,7 +82,7 @@ function AccountCard({ account, onDelete, onEdit }) {
     const handleDelete = async () => {
         try {
             const response = await authFetch(
-                `http://localhost:8000/accounts/${account.id}`, 
+                `${API_URL}/accounts/${account.id}`, 
                 {
                     method: "DELETE"
                 }

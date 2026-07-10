@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { API_URL } from "../config";
 
 function Login() {
     const [username, setUsername] = useState("");
@@ -16,7 +17,7 @@ function Login() {
         formData.append("password", password);
 
         try {
-            const response = await fetch('http://localhost:8000/login', {
+            const response = await fetch(`${API_URL}/login`, {
                 method: "POST",
                 body: formData 
             }); // we don't need headers: {"Content-Type", "application/json"} The browser automatically sets the correct Content-Type for FormData.
