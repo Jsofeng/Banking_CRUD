@@ -39,16 +39,8 @@ This tells Docker to create and manage a persistent storage volume.
 
 services: defines all containers your application needs
 
-Right now you have:
 
-* PostgreSQL
-* FastAPI
-
-Later you could add:
-
-* React
-* Redis
-* Nginx
+DOCKER ALIAS:
 
 db: the name of your container 
 
