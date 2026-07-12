@@ -1,3 +1,5 @@
+IN ORDER TO RUN PYTEST GO ON TERMINAL backend/ COMMENT Base.metadata.create_all(bind=engine) in main.py then run python -m pytest
+
 """
 pytest
    │

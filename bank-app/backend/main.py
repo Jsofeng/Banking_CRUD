@@ -9,7 +9,7 @@ from schemas import AccountCreate, AccountResponse, AccountUpdate, AccountTransa
 from auth import hash_password, verify_password, create_access_token, verify_token
 
 #Base.metadata.drop_all(bind=engine) #keep this for temporary use
-#Base.metadata.create_all(bind=engine) #Look at all SQLAlchemy models that inherit from Base, and create their tables in Postgres if they don’t exist.
+Base.metadata.create_all(bind=engine) #Look at all SQLAlchemy models that inherit from Base, and create their tables in Postgres if they don’t exist.
 
 """
 models.py inherits Base & creates this 
