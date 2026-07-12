@@ -1,0 +1,27 @@
+"""
+pytest
+   │
+   ▼
+AsyncClient
+   │
+   ▼
+FastAPI app (directly in memory)
+
+Test starts
+      │
+create tables
+      │
+open database session
+      │
+run test
+      │
+close session
+      │
+delete tables
+
+"""
+
+
+RUN inside backend/
+
+python -m pytest 
