@@ -7,29 +7,6 @@ from sqlalchemy.orm import sessionmaker
 from main import app, get_db
 from database import Base
 
-"""
-pytest
-   │
-   ▼
-AsyncClient
-   │
-   ▼
-FastAPI app (directly in memory)
-
-Test starts
-      │
-create tables
-      │
-open database session
-      │
-run test
-      │
-close session
-      │
-delete tables
-
-"""
-
 #test databse
 TEST_DATABASE_URL = "postgresql://postgres:password@db:5432/bank_app_test"
 
