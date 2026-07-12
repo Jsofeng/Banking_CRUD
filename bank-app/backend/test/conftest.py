@@ -1,14 +1,19 @@
 # A fixture is just a function decorated with @pytest.fixture. pytest automatically calls it before each test that requests it. 
 import pytest
-from httpx import AsyncClient
+import pytest_asyncio
+from httpx import AsyncClient, ASGITransport
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import os 
+from dotenv import load_dotenv
 
 from main import app, get_db
 from database import Base
 
+load_dotenv()
+
 #test databse
-TEST_DATABASE_URL = "postgresql://postgres:password@db:5432/bank_app_test"
+TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL", "postgresql://postgres:password@localhost:5432/bank_app_test")
 
 engine = create_engine(TEST_DATABASE_URL)
 
@@ -42,8 +47,10 @@ def override_get_db(): #for endpoints in main they call bank_app's database but 
 # Tell FastAPI to use the test database
 app.dependency_overrides[get_db] = override_get_db
 
-@pytest.fixture
-async def client(): #This gives every test its own fake browser.
-    async with AsyncClient(app=app, base_url="http://test") as client:
+@pytest_asyncio.fixture
+async def client(db):  # <-- depend on db fixture here #This creates a fake browser/Postman that talks directly to FastAPI.
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client
+
 

@@ -54,3 +54,20 @@ def test_verify_invalid_token():
         verify_token("this_is_not_a_real_token")
 
 
+@pytest.mark.asyncio
+async def test_register(client):
+
+    response = await client.post(
+        "/register",
+        json={
+            "username": "testuser",
+            "email": "test@example.com",
+            "password": "password123"
+        }
+    )
+    data = response.json()
+    assert response.status_code in [200, 201]
+    assert data["username"] == "testuser"
+    assert data["email"] == "test@example.com"
+    assert "hashed_password" not in data
+
