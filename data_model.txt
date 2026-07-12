@@ -43,3 +43,17 @@ step3
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdHJpbmciLCJleHAiOjE3ODI4NzY1NzV9.qEKDPakbPAnZTXGnVRcjLKilSKmzlUgYBkJiuwjcexw",
   "token_type": "bearer"
 }
+
+TESTING
+
+- pytest: The test runner — finds and runs all your tests
+- pytest-asyncio  Lets pytest handle async FastAPI routes
+- httpx HTTP client that simulates real requests to your API
+
+
+backend/
+└── tests/
+    ├── __init__.py        ← makes it a Python package (can be empty)
+    ├── conftest.py        ← shared setup that all tests can use
+    ├── test_auth.py       ← tests for register/login
+    └── test_accounts.py   ← tests for your CRUD endpoints
