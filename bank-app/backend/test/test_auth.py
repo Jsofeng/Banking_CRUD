@@ -1,4 +1,5 @@
-from auth import hash_password, verify_password
+import pytest
+from auth import hash_password, verify_password, create_access_token, verify_token
 
 def test_hash_password():
     password = "my_password123"
@@ -13,7 +14,6 @@ def test_hash_password():
 
 
 def test_verify_password():
-
     password = "my_secret_password"
 
     hashed_password = hash_password(password)
@@ -22,8 +22,8 @@ def test_verify_password():
 
     assert result == True
 
-def test_verify_wrong_password():
 
+def test_verify_wrong_password():
     password = "my_secret_password"
 
     hashed_password = hash_password(password)
@@ -31,3 +31,26 @@ def test_verify_wrong_password():
     result = verify_password("wrong_password", hashed_password)
 
     assert result == False
+
+
+def test_create_access_token():
+
+    token = create_access_token({"sub": "testuser"})
+
+    assert isinstance(token, str)
+    assert token != ""
+
+
+def test_verify_token():
+    username = "testuser"
+    token = create_access_token({"sub": username})
+
+    decode = verify_token(token)
+
+    assert decode == username
+
+def test_verify_invalid_token():
+    with pytest.raises(Exception): #verify_token returns an Exception if the token is invalid so this basically says (“pytest, pay attention. I expect an Exception to happen next.” returns true if it got what it expected)
+        verify_token("this_is_not_a_real_token")
+
+
