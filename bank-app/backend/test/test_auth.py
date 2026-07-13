@@ -49,6 +49,12 @@ def test_verify_token():
 
     assert decode == username
 
+"""
+Tracing through your actual function: jwt.decode(...) will fail to parse "this_is_not_a_real_token" as a valid JWT, 
+which raises a JWTError internally. Your except JWTError: block catches that and re-raises 
+a plain Exception("Invalid or expired token"). Since pytest.raises(Exception) is watching for exactly that, the test passes.
+"""
+
 def test_verify_invalid_token():
     with pytest.raises(Exception): #verify_token returns an Exception if the token is invalid so this basically says (“pytest, pay attention. I expect an Exception to happen next.” returns true if it got what it expected)
         verify_token("this_is_not_a_real_token")
