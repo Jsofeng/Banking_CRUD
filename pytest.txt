@@ -1,4 +1,4 @@
-IN ORDER TO RUN PYTEST GO ON TERMINAL backend/ COMMENT Base.metadata.create_all(bind=engine) in main.py then run python -m pytest
+IN ORDER TO RUN PYTEST RUN "DOCKER COMPOSE UP" GO ON TERMINAL backend/ COMMENT Base.metadata.create_all(bind=engine) in main.py then run python -m pytest
 
 """
 pytest
@@ -27,3 +27,18 @@ delete tables
 RUN inside backend/
 
 python -m pytest 
+
+
+TESTING
+
+- pytest: The test runner — finds and runs all your tests
+- pytest-asyncio  Lets pytest handle async FastAPI routes
+- httpx HTTP client that simulates real requests to your API
+
+
+backend/
+└── tests/
+    ├── __init__.py        ← makes it a Python package (can be empty)
+    ├── conftest.py        ← shared setup that all tests can use
+    ├── test_auth.py       ← tests for register/login
+    └── test_accounts.py   ← tests for your CRUD endpoints
