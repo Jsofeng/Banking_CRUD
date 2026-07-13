@@ -117,3 +117,10 @@ postgresql://postgres:password@db:5432/bank_app
 
 
 RUN docker exec -it bank-db psql -U postgres -d bank_app 
+
+backend:
+  depends_on:
+    db:
+      condition: service_healthy
+
+- By specifying condition: service_healthy, you're telling Compose: "don't start the backend container until the db container's healthcheck reports healthy." 
