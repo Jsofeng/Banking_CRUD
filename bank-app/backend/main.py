@@ -221,8 +221,8 @@ def get_transactions(id: int, db: Session = Depends(get_db), current_user: User 
     transactions = db.query(Transaction).filter(Transaction.account_id == account.id).all()    
     return transactions
 
+#since response_model=UserResponse and UserResponse schema doesn't include hashedpassword return new_user does ONLY returns whats included in UserResponse
 @app.post("/register", response_model=UserResponse)
-
 def register(user: UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.username == user.username).first()
     existing_email = db.query(User).filter(User.email == user.email).first()
