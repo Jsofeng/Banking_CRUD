@@ -8,6 +8,7 @@ import os
 from dotenv import load_dotenv
 
 from main import app, get_db
+from models import User
 from database import Base
 
 load_dotenv()
@@ -53,4 +54,33 @@ async def client(db):  # <-- depend on db fixture here #This creates a fake brow
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client
 
+@pytest_asyncio.fixture #allows pytest to automatically injects fixtures by name 
+async def authenticated_user(client: AsyncClient, db):
+    await client.post(
+        "/register",
+        json={
+            "username": "testuser",
+            "email": "test@example.com",
+            "password": "password123"
+        }
+    )
+
+    user = db.query(User).filter(User.username == "testuser").first()
+
+    login_response = await client.post(
+        "/login",
+        data={
+            "username": "testuser",
+            "password": "password123"
+        }
+    )
+
+    token = login_response.json()["access_token"]
+
+    return {
+        "headers": {
+            "Authorization": f"Bearer {token}"
+        },
+        "user_id": user.id
+    }
 
