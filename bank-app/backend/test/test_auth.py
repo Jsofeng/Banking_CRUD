@@ -77,8 +77,8 @@ async def test_register(client):
     assert data["email"] == "test@example.com"
     assert "hashed_password" not in data
 
-@pytest.mark.asyncio
 
+@pytest.mark.asyncio
 async def test_duplicate_register(client):
 
     user_data = {
@@ -102,3 +102,32 @@ async def test_duplicate_register(client):
     )
 
     assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_login(client):
+    # Register a user first
+    await client.post(
+        "/register",
+        json={
+            "username": "testuser",
+            "email": "test@example.com",
+            "password": "password123"
+        }
+    )
+
+    # Login with the same credentials
+    response = await client.post(
+        "/login",
+        data={
+            "username": "testuser",
+            "password": "password123"
+        }
+    )
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert "access_token" in body
+    assert body["token_type"] == "bearer"
