@@ -131,3 +131,25 @@ async def test_login(client):
 
     assert "access_token" in body
     assert body["token_type"] == "bearer"
+
+@pytest.mark.asyncio
+async def test_login_wrong_password(client):
+    
+    await client.post(
+        "/register",
+        json={
+            "username": "testuser",
+            "email": "test@example.com",
+            "password": "password123"
+        }
+    )
+
+    response = await client.post(
+        "/login",
+        data={
+            "username": "testuser",
+            "password": "wrongpassword"
+        }
+    )
+
+    assert response.status_code == 401
