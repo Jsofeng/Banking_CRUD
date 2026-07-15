@@ -21,3 +21,18 @@ async def test_create_account(client, authenticated_user):
     assert body["balance"] == 1000.0
 
     assert body["id"] == authenticated_user["user_id"]
+
+
+@pytest.mark.asyncio
+async def test_create_account_with_no_auth_headers(client):
+    response = await client.post(
+        "/accounts",
+        json={
+            "owner_name": "Joe",
+            "balance": 1000.0,
+            "account_type": "checking"
+        }
+    )
+
+    assert response.status_code == 401
+
