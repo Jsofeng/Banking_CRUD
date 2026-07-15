@@ -229,3 +229,41 @@ async def test_update_account_balance(client, authenticated_user):
 
     assert new_balance == 100000.0
 
+
+@pytest.mark.asyncio
+async def test_delete_account(client, authenticated_user):
+    headers = authenticated_user["headers"]
+
+    #create account
+    created_response = await client.post(
+        "/accounts",
+        json={
+            "owner_name": "test_user",
+            "balance": 1000.0,
+            "account_type": "checking"
+        },
+        headers=headers
+    )
+
+    assert created_response.status_code == 200
+
+    account_id = created_response.json()["id"]
+
+    #delete account
+    delete_response = await client.delete(
+        f"/accounts/{account_id}",
+        headers=headers
+    )
+
+    assert delete_response.status_code == 200
+
+    #fetch for the deleted account
+    response = await client.get(
+        f"/accounts/{account_id}",
+        headers=headers
+    )
+
+    assert response.status_code == 404
+
+
+
