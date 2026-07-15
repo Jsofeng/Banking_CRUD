@@ -144,3 +144,39 @@ async def test_account_ownership_privacy(client):
 
     assert isinstance(body, list)
     assert len(body) == 0
+
+@pytest.mark.asyncio
+async def test_account_id_match(client, authenticated_user):
+    headers = authenticated_user["headers"]
+
+    created_response = await client.post(
+        "/accounts",
+        json={
+            "owner_name": "test_user",
+            "balance": 1000.0,
+            "account_type": "checking"
+        },
+        headers=headers
+    )
+
+    assert created_response.status_code == 200
+
+    created_account = created_response.json()
+    account_id = created_account["id"]
+
+    # Fetch account by ID
+    response = await client.get(
+        f"/accounts/{account_id}",
+        headers=headers
+    )
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["id"] == account_id
+    assert body["owner_name"] == "test_user"
+    assert body["balance"] == 1000.0
+    assert body["account_type"] == "checking"
+    assert body["id"] == authenticated_user["user_id"]
+
