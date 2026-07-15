@@ -36,6 +36,7 @@ async def test_create_account_without_token(client):
 
     assert response.status_code == 401
 
+
 @pytest.mark.asyncio
 async def test_get_accounts(client, authenticated_user):
     headers = authenticated_user["headers"]
@@ -71,6 +72,7 @@ async def test_get_accounts(client, authenticated_user):
 
     assert isinstance(body, list)
     assert len(body) == 2
+
 
 @pytest.mark.asyncio
 async def test_account_ownership_privacy(client):
@@ -145,6 +147,7 @@ async def test_account_ownership_privacy(client):
     assert isinstance(body, list)
     assert len(body) == 0
 
+
 @pytest.mark.asyncio
 async def test_account_id_match(client, authenticated_user):
     headers = authenticated_user["headers"]
@@ -179,4 +182,50 @@ async def test_account_id_match(client, authenticated_user):
     assert body["balance"] == 1000.0
     assert body["account_type"] == "checking"
     assert body["id"] == authenticated_user["user_id"]
+
+
+@pytest.mark.asyncio
+async def test_invalid_account_id(client, authenticated_user):
+    headers = authenticated_user["headers"]
+
+    response = await client.get(
+        "/accounts/99999",
+        headers=headers
+    )
+
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_update_account_balance(client, authenticated_user):
+    headers = authenticated_user["headers"]
+
+    #create account
+    created_response = await client.post(
+        "/accounts",
+        json={
+            "owner_name": "test_user",
+            "balance": 1000.0,
+            "account_type": "checking"
+        },
+        headers=headers
+    )
+
+    assert created_response.status_code == 200
+
+    account_id = created_response.json()["id"]
+
+    response = await client.put(
+        f"/accounts/{account_id}",
+        json={
+            "balance": 100000.0,
+        },
+        headers=headers
+    )
+
+    assert response.status_code == 200
+
+    new_balance = response.json()["balance"]
+
+    assert new_balance == 100000.0
 
