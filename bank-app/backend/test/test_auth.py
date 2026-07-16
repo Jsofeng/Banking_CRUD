@@ -1,5 +1,7 @@
 import pytest
-from auth import hash_password, verify_password, create_access_token, verify_token
+from auth import hash_password, verify_password, create_access_token, verify_token, SECRET_KEY, ALGORITHM
+from jose import jwt 
+
 
 def test_hash_password():
     password = "my_password123"
@@ -58,6 +60,19 @@ a plain Exception("Invalid or expired token"). Since pytest.raises(Exception) is
 def test_verify_invalid_token():
     with pytest.raises(Exception): #verify_token returns an Exception if the token is invalid so this basically says (“pytest, pay attention. I expect an Exception to happen next.” returns true if it got what it expected)
         verify_token("this_is_not_a_real_token")
+
+
+@pytest.mark.asyncio
+async def test_verify_token_missing_username():
+    #create a token
+    token = jwt.encode(
+        {},
+        SECRET_KEY,
+        algorithm=ALGORITHM
+    )
+
+    with pytest.raises(Exception):
+        verify_token(token)
 
 
 @pytest.mark.asyncio
