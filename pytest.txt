@@ -42,3 +42,18 @@ backend/
     ├── conftest.py        ← shared setup that all tests can use
     ├── test_auth.py       ← tests for register/login
     └── test_accounts.py   ← tests for your CRUD endpoints
+
+
+pip install pytest-cov (This runs all your tests and prints a table showing which lines of code were hit and which were missed.)
+
+RUN pytest --cov=. --cov-report=term-missing
+
+Name              Stmts   Miss  Cover
+--------------------------------------
+main.py              45      3    93%
+auth.py              30      0   100%
+models.py            12      0   100%
+
+Stmts - total lines of code
+Miss - lines no test touched
+Cover - percentage covered
