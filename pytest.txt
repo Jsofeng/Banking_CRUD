@@ -57,3 +57,7 @@ models.py            12      0   100%
 Stmts - total lines of code
 Miss - lines no test touched
 Cover - percentage covered
+
+RUN pytest --cov=. --cov-report=html
+This creates a htmlcov/ folder. Open htmlcov/index.html in your browser to see a visual, line-by-line breakdown of what's covered and what isn't. Green = tested, red = not tested.
+
