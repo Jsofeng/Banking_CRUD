@@ -39,6 +39,13 @@ function AccountForm() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(newAccount),
+                //calling authfetch 
+                /* final headers will be 
+                  headers:{
+                      "Content-Type":"application/json",
+                      "Authorization":"Bearer eyJhbGciOiJIUzI1Ni..."
+                  }
+                */
             }
         );
         
