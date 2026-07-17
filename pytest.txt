@@ -61,3 +61,7 @@ Cover - percentage covered
 RUN pytest --cov=. --cov-report=html
 This creates a htmlcov/ folder. Open htmlcov/index.html in your browser to see a visual, line-by-line breakdown of what's covered and what isn't. Green = tested, red = not tested.
 
+pytest -v run every individual test and shows whether passed or not 
+python -m pytest test/filename (tests all functions in that file)
+
+pytest tests/test_auth.py::function_name -v (tests that individual function in that file)
