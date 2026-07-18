@@ -17,3 +17,15 @@ async def test_require_admin_non_admin():
     assert exc.value.status_code == 403
     assert exc.value.detail == "Not authorized"
 
+@pytest.mark.asyncio
+async def test_require_admin_admin():
+    admin = User(
+        username="Jonathan",
+        email="jonathan.j@gmail.com",
+        role="admin"
+    )
+
+    res = require_admin(admin)
+
+    assert res == admin
+    
