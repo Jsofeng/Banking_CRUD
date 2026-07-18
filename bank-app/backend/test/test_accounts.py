@@ -294,6 +294,39 @@ async def test_update_account_balance(client, authenticated_user):
 
 
 @pytest.mark.asyncio
+async def test_update_account_frozen(client, authenticated_user):
+    headers = authenticated_user["headers"]
+
+    created_response = await client.post(
+        "/accounts",
+        json={
+            "owner_name": "test_user",
+            "balance": 1000.0,
+            "account_type": "checking"
+        },
+        headers=headers
+    )
+
+    assert created_response.status_code == 200
+    account_id = created_response.json()["id"]
+
+    response = await client.put(
+        f"/accounts/{account_id}",
+        json={
+            "frozen": True
+        },
+        headers=headers
+    )
+
+    assert response.status_code == 200
+
+    isfrozen = response.json()["frozen"]
+
+    assert isfrozen == True
+
+
+
+@pytest.mark.asyncio
 async def test_delete_account(client, authenticated_user):
     headers = authenticated_user["headers"]
 
