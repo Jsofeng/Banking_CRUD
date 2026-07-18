@@ -195,6 +195,37 @@ async def test_invalid_account_id(client, authenticated_user):
 
     assert response.status_code == 404
 
+@pytest.mark.asyncio
+async def test_update_account_owner_name(client, authenticated_user):
+    headers = authenticated_user["headers"]
+
+    created_response = await client.post(
+        "/accounts",
+        json={
+            "owner_name": "test_user",
+            "balance": 1000.0,
+            "account_type": "checking"
+        },
+        headers=headers
+    )
+
+    assert created_response.status_code == 200
+    account_id = created_response.json()["id"]
+
+    response = await client.put(
+        f"/accounts/{account_id}",
+        json={
+            "owner_name": "new_user"
+        },
+        headers=headers
+    )
+
+    assert response.status_code == 200
+
+    owner_name = response.json()["owner_name"]
+
+    assert owner_name == "new_user"
+
 
 @pytest.mark.asyncio
 async def test_update_account_balance(client, authenticated_user):
