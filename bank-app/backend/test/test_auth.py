@@ -63,6 +63,22 @@ def test_verify_invalid_token():
 
 
 @pytest.mark.asyncio
+async def test_verify_token_invalid_user(client):
+    token = create_access_token({"sub": "ghost_user"}) #token is successfully created
+
+    #"ghost_user" was never registered"
+    response = await client.get(    
+        "/accounts",
+        headers={
+            "Authorization": f"Bearer {token}"
+        }
+    )
+
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Invalid token or user not found"
+
+
+@pytest.mark.asyncio
 async def test_verify_token_missing_username():
     #create a token
     token = jwt.encode(
@@ -168,3 +184,4 @@ async def test_login_wrong_password(client):
     )
 
     assert response.status_code == 401
+
