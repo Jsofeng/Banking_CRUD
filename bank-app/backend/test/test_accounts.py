@@ -325,7 +325,6 @@ async def test_update_account_frozen(client, authenticated_user):
     assert isfrozen == True
 
 
-
 @pytest.mark.asyncio
 async def test_delete_account(client, authenticated_user):
     headers = authenticated_user["headers"]
@@ -362,4 +361,35 @@ async def test_delete_account(client, authenticated_user):
     assert response.status_code == 404
 
 
+@pytest.mark.asyncio
+async def test_set_frozen_not_frozen(client, authenticated_user):
+    headers = authenticated_user["headers"]
+
+    created_response = await client.post(
+        "/accounts",
+        json={
+            "owner_name": "test_user",
+            "balance": 1000.0,
+            "account_type": "checking"
+        },
+        headers=headers
+    )
+
+    assert created_response.status_code == 200
+
+    account_id = created_response.json()["id"]
+
+    response = await client.patch(
+        f"/accounts/{account_id}/set_freeze",
+        json={
+            "freeze": True
+        },
+        headers=headers
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+
+    assert body["id"] == account_id
+    assert body["frozen"] == True
 
