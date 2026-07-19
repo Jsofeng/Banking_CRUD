@@ -136,6 +136,39 @@ async def test_duplicate_register(client):
 
 
 @pytest.mark.asyncio
+async def test_duplicate_email_register(client):
+
+    user_data1 = {
+        "username": "testuser1",
+        "email": "test@example.com",
+        "password": "password123"
+    }
+
+    user_data2 = {
+        "username": "testuser2",
+        "email": "test@example.com",
+        "password": "password1234"
+    }
+
+    # First registration should succeed
+    response = await client.post(
+        "/register",
+        json=user_data1
+    )
+
+    assert response.status_code == 200  
+
+    # Second registration with same email should fail
+    response = await client.post(
+        "/register",
+        json=user_data2
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Email already exists"
+
+
+@pytest.mark.asyncio
 async def test_login(client):
     # Register a user first
     await client.post(
