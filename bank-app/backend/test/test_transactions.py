@@ -18,7 +18,7 @@ async def test_get_transactions(client, authenticated_user):
 
     account_id = created_response.json()["id"]
 
-    transaction = await client.patch(
+    transaction1 = await client.patch(
         f"/accounts/{account_id}/transaction",
         json={
             "amount": 1000.0,
@@ -27,7 +27,18 @@ async def test_get_transactions(client, authenticated_user):
         headers=headers
     )
 
-    assert transaction.status_code == 200
+    assert transaction1.status_code == 200
+
+    transaction2 = await client.patch(
+        f"/accounts/{account_id}/transaction",
+        json={
+            "amount": 100.0,
+            "transaction_type": "withdrawal"
+        },
+        headers=headers
+    )
+
+    assert transaction2.status_code == 200
 
     response = await client.get(
         f"/accounts/{account_id}/transaction",
@@ -36,10 +47,14 @@ async def test_get_transactions(client, authenticated_user):
 
     transactions = response.json()
 
-    assert len(transactions) == 1
+    assert len(transactions) == 2
     assert transactions[0]["amount"] == 1000.0
     assert transactions[0]["transaction_type"] == "deposit"
     assert transactions[0]["account_id"] == account_id
+    
+    assert transactions[1]["amount"] == 100.0
+    assert transactions[1]["transaction_type"] == "withdrawal"
+    assert transactions[1]["account_id"] == account_id
 
 
 @pytest.mark.asyncio
