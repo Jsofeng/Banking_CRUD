@@ -433,7 +433,7 @@ async def test_set_frozen_unfreeze(client, authenticated_user):
 
 
 @pytest.mark.asyncio
-async def test_set_frozen_already_frozen(client, authenticated_user):
+async def test_set_frozen_already_frozen_or_unfrozen(client, authenticated_user):
     headers = authenticated_user["headers"]
 
     created_response = await client.post(
