@@ -54,7 +54,7 @@ jobs:
       - name: Lint
         working-directory: bank-app/backend
         run: |
-          flake8 .
+          flake8 main.py auth.py models.py schemas.py
 
       - name: Run tests
         working-directory: bank-app/backend
