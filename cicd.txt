@@ -16,3 +16,72 @@ Backend CI
 └── Build ✅
     ├── Checkout
     └── Docker Compose Build
+
+
+HOW IT WORKS
+
+BACKEND CI runs whenever someone pushes to main or sends a pull req to main
+
+Job:
+    A workflow contains one or more jobs.
+    (e.g my current ci.yml has 2 jobs)
+    jobs:
+        test:
+            GitHub Server
+                Ubuntu machine
+                |
+                |
+                Your project
+                Python
+                PostgreSQL
+                pytest
+        build:
+
+services:
+    Creates supporting containers needed by your application. (e.g postgres)
+
+    options: >- 
+    - Extra Docker options.
+
+env:
+    SECRET_KEY: ${{ secrets.SECRET_KEY }}
+    
+    This pulls from
+    GitHub Repository
+    |
+    Settings
+    |
+    Secrets and Variables
+    |
+    Actions
+    |
+    SECRET_KEY
+
+steps:
+    Actions executed in order.
+
+    - name: Checkout repository
+        uses: actions/checkout@v4
+
+    - name: Set up Python
+        uses: actions/setup-python@v5
+
+    - name: Install dependencies
+        working-directory: bank-app/backend (moves to that directory)
+
+    - name: Run tests
+        test/
+        test_auth.py
+        test_accounts.py
+        test_transactions.py
+        ...
+
+build:
+    runs-on: ubuntu-latest
+        - creates another ubuntu machine
+
+    needs: test
+        - Docker only builds if tests pass.
+        
+    docker compose build
+    
