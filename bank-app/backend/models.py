@@ -1,13 +1,17 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey
 from datetime import datetime
+
+from sqlalchemy import (Boolean, Column, DateTime, Float, ForeignKey, Integer,
+                        String)
 
 from database import Base
 
 
 class Account(Base):
-    __tablename__ = "accounts"  #tells SQLAlchemy what to call the table in postgres
+    __tablename__ = "accounts"  # tells SQLAlchemy what to call the table in postgres
 
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True) #index=True means create an index on this column
+    id = Column(
+        Integer, primary_key=True, index=True, autoincrement=True
+    )  # index=True means create an index on this column
     owner_name = Column(String(100))
     account_type = Column(String(20), nullable=False, default="chequing")
     balance = Column(Integer, nullable=False, default=0)
@@ -26,23 +30,17 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
 
-    role = Column(
-        String,
-        nullable=False,
-        default="user"   # "user" or "admin"
-    )
+    role = Column(String, nullable=False, default="user")  # "user" or "admin"
 
     created_at = Column(DateTime, default=datetime.utcnow)
+
 
 class Transaction(Base):
     __tablename__ = "transactions"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     account_id = Column(Integer, ForeignKey("accounts.id"))
-    transaction_type = Column(String) #deposit or withdrawl for now
+    transaction_type = Column(String)  # deposit or withdrawl for now
     amount = Column(Float)
 
     created_at = Column(DateTime, default=datetime.utcnow)
-
-
-
