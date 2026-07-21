@@ -132,6 +132,7 @@ def get_account_id(id: int, db: Session = Depends(get_db), current_user: User = 
     
     return account
 
+#IMPLEMENT TO ACCOUNTCARD
 @app.put("/accounts/{id}", response_model=AccountResponse)
 def update_account(id: int, updated_data: AccountUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     
