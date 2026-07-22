@@ -5,6 +5,11 @@ import TransactionList from "./TransactionList";
 import { API_URL } from "../config";
 
 function AccountCard({ account, onDelete, onEdit }) {
+   const [editing, setEditing] = useState(false);
+
+   const [ownerName, setOwnerName] = useState(account.owner_name);
+   const [accountType, setAccountType] = useState(account.account_type);
+   
    const [amount, setAmount] = useState("");
    const [type, setType] = useState("deposit");
    const [showTransactions, setShowTransactions] = useState(false);
@@ -77,6 +82,39 @@ function AccountCard({ account, onDelete, onEdit }) {
         }
     }
 
+    const handleUpdate = async () => {
+        try {
+            const response = await authFetch(
+                `${API_URL}/accounts/${account.id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        owner_name: ownerName,
+                        account_type: accountType,
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+                const error = await response.json();
+                console.log("Backend error:", error);
+                throw new Error("Failed to update account");
+            }
+
+            const updatedAccount = await response.json();
+
+            onEdit(updatedAccount);
+            setEditing(false);
+
+        } catch (error) {
+            console.error(error);
+            alert("Failed to update account");
+        }
+    };
+
     // not using async here bc backend delete endpoint returns json so response.json() can read it 
     
     const handleDelete = async () => {
@@ -107,11 +145,35 @@ function AccountCard({ account, onDelete, onEdit }) {
 
     return (
         <div className="card">
-            <h3>{account.owner_name}</h3>
-            <p className={account.account_type}>
-                Type: {account.account_type}
-            </p>
+            {/* Owner Name */}
+            {editing ? (
+                <input
+                    value={ownerName}
+                    onChange={(e) => setOwnerName(e.target.value)}
+                />
+            ) : (
+                <h3>{account.owner_name}</h3>
+            )}
+
+            {/* Account Type */}
+            {editing ? (
+                <select
+                    value={accountType}
+                    onChange={(e) => setAccountType(e.target.value)}
+                >
+                    <option value="chequing">Chequing</option>
+                    <option value="savings">Savings</option>
+                </select>
+            ) : (
+                <p className={account.account_type}>
+                    Type: {account.account_type}
+                </p>
+            )}
+
+            {/* Balance */}
             <p>Balance: ${account.balance}</p>
+
+
             {/* Transaction UI */}
             <input
                 type="number"
@@ -132,6 +194,21 @@ function AccountCard({ account, onDelete, onEdit }) {
             
             <button onClick={() => setShowTransactions(!showTransactions)}>{showTransactions ? "Hide Transaction History" : "Transaction History"}</button> 
             <button onClick={handleFreeze}>{account.frozen ? "Unfreeze Account" : "Freeze"}</button>
+            { editing ? (
+                <>
+                    <button onClick={handleUpdate}>
+                        Save
+                    </button>
+
+                    <button onClick={() => setEditing(false)}>
+                        Cancel
+                    </button>
+                </>
+            ) : (
+                <button onClick={() => setEditing(true)}>
+                    Edit
+                </button>
+            )}
             <button onClick={handleDelete}>
                 Delete Account
             </button>
