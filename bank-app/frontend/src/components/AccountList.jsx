@@ -31,9 +31,11 @@ function AccountList() {
 
     // Searches the accounts hashmap Find the account that was edited, replace it with the new version, keep everything else the same.
     const handleEdit = (updatedAccount) => {
-        setAccounts(
-            accounts.map(acc => 
-                acc.id === updatedAccount.id ? updatedAccount : acc
+    setAccounts(prevAccounts =>
+        prevAccounts.map(acc =>
+            acc.id === updatedAccount.id
+                ? updatedAccount
+                : acc
             )
         );
     };
