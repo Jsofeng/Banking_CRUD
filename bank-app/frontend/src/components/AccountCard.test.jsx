@@ -19,9 +19,10 @@ describe("AccountCard", () => {
         };
 
 
-        const mockOnEdit = vi.fn();
+        const mockOnEdit = vi.fn(); //“Create a function that remembers when it gets called.”
 
 
+        //fake fetch(PUT /accounts/1)
         globalThis.fetch = vi.fn(() =>
             Promise.resolve({
                 ok: true,
@@ -36,7 +37,17 @@ describe("AccountCard", () => {
             })
         );
 
+        /*
+        CREATES
 
+        <AccountCard
+            account={
+                {
+                owner_name:"Jonathan"
+                }
+            }
+        />
+        */
         render(
             <AccountCard
                 account={mockAccount}
@@ -45,24 +56,35 @@ describe("AccountCard", () => {
             />
         );
 
-
+        // user click edit button
         await user.click(
             screen.getByRole("button", { name: "Edit" })
         );
 
-
+        //before clicking -> Jonathan -> after clicking -> <input value="Jonathan"/> since component does setEditing(true)
+        //then looks for <input value="Jonathan"/> and stores it 
         const ownerInput = screen.getByDisplayValue("Jonathan");
 
-
+        // <input value= ""> -> <input value="Alex"
         await user.clear(ownerInput);
         await user.type(ownerInput, "Alex");
 
-
+        //Runs handleUpdate() & sends fetch to that endpoint 
         await user.click(
             screen.getByRole("button", { name: "Save" })
         );
 
+        /* 
 
+        Verifies this happened
+        fetch(
+            "/accounts/1",
+            {
+                method:"PUT"
+            }
+            )
+        
+        */
         expect(globalThis.fetch).toHaveBeenCalledWith(
             expect.any(String),
             expect.objectContaining({
@@ -70,7 +92,7 @@ describe("AccountCard", () => {
             })
         );
 
-
+        //checks if the component called onEdit(updatedAccount) aka onEdit(mockOnEdit)
         expect(mockOnEdit).toHaveBeenCalledWith(
             expect.objectContaining({
                 owner_name: "Alex"
