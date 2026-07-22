@@ -38,6 +38,31 @@ step3
 - enter user & password 
 
 
+handleUpdate workflow:
+
+User clicks Save
+        |
+        v
+AccountCard handleUpdate()
+        |
+        v
+PUT /accounts/{id}
+        |
+        v
+FastAPI returns updated account
+        |
+        v
+onEdit(updatedAccount)
+        |
+        v
+AccountList handleEdit()
+        |
+        v
+Replace old account in accounts[]
+        |
+        v
+React re-renders AccountCard
+
 
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdHJpbmciLCJleHAiOjE3ODI4NzY1NzV9.qEKDPakbPAnZTXGnVRcjLKilSKmzlUgYBkJiuwjcexw",
