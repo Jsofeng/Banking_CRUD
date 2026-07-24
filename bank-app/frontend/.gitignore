@@ -13,6 +13,7 @@ dist
 dist-ssr
 *.local
 .coverage
+coverage/
 htmlcov
 
 # Editor directories and files
