@@ -1,15 +1,26 @@
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from auth import (create_access_token, hash_password, verify_password,
-                  verify_token)
+from auth import create_access_token, hash_password, verify_password, verify_token
 from database import SessionLocal
 from models import Account, Transaction, User
-from schemas import (AccountCreate, AccountFreeze, AccountResponse,
-                     AccountTransaction, AccountUpdate, Token,
-                     TransactionResponse, UserCreate, UserResponse)
+from schemas import (
+    AccountCreate,
+    AccountFreeze,
+    AccountResponse,
+    AccountTransaction,
+    AccountUpdate,
+    Token,
+    TransactionResponse,
+    UserCreate,
+    UserResponse,
+)
+
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from limiter import limiter
 
 # Base.metadata.drop_all(bind=engine) #keep this for temporary use
 # Base.metadata.create_all(bind=engine) #Look at all SQLAlchemy models that inherit from Base, and create their tables in Postgres if they don’t exist.
@@ -57,6 +68,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# app.state as a shared storage box attached to your FastAPI app.
+app.state.limiter = limiter
+
+# Tells FastAPI If someone exceeds the limit, return a 429 response.
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 """
 oauth2_scheme = security guard at the door
@@ -304,8 +321,11 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @app.post("/login", response_model=Token)
+@limiter.limit("5/minute")
 def login(
-    db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
+    request: Request,
+    db: Session = Depends(get_db),
+    form_data: OAuth2PasswordRequestForm = Depends(),
 ):  # form_data: OAuth2PasswordRequestForm = Depends() automatically reads username=... password=...
     user = (
         db.query(User).filter(User.username == form_data.username).first()

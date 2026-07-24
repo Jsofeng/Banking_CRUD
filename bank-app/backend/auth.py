@@ -4,8 +4,9 @@ from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
 from jose import JWTError, jwt
-from passlib.context import \
-    CryptContext  # Passlib uses a "context" object to handle hashing
+from passlib.context import (
+    CryptContext,
+)  # Passlib uses a "context" object to handle hashing
 
 load_dotenv()
 
