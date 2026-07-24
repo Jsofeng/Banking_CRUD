@@ -1,0 +1,33 @@
+             React
+               |
+               |
+          FastAPI Backend
+          /           \
+         /             \
+ PostgreSQL          Redis
+ (data)          (rate limits/cache)
+
+
+ - slowapi -> rate limiting lib
+
+                  main.py
+                    |
+                    |
+             from limiter import limiter
+                    |
+                    v
+
+              limiter.py
+
+        Limiter(
+          IP tracking,
+          Redis storage
+        )
+
+                    |
+                    v
+
+                 Redis
+
+          login attempts:
+          IP -> count
