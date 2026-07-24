@@ -85,3 +85,13 @@ build:
         
     docker compose build
     
+
+FRONTEND CI
+
+* Checkout repository downloads your code onto the GitHub Actions runner.
+* Set up Node.js installs the version of Node your project uses.
+* Cache npm speeds up future workflow runs by reusing downloaded packages.
+* Install dependencies installs everything from package.json.
+* Lint checks your code style with ESLint.
+* Run tests executes your Vitest test suite.
+* Build application ensures your app can be compiled into production assets.
