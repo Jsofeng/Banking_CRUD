@@ -23,6 +23,14 @@ function Login() {
             }); // we don't need headers: {"Content-Type", "application/json"} The browser automatically sets the correct Content-Type for FormData.
             
             if (!response.ok) {
+                const errorData = await response.json();
+
+                console.log("ERROR BODY:", errorData);
+                
+                if (response.status === 429) {
+                    throw new Error(errorData.error);
+                }
+
                 throw new Error("Invalid username or password");
             }
 
@@ -33,7 +41,7 @@ function Login() {
             navigate("/accounts");
 
         } catch (error) {
-            alert("Login failed. Please check your username and password")
+            alert(error.message)
             console.log(error)
         }
 
