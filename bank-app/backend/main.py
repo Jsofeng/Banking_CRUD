@@ -61,15 +61,15 @@ app = FastAPI()
 
 app.state.limiter = limiter
 
+
 # Tells FastAPI If someone exceeds the limit, return a 429 response.
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
     return JSONResponse(
         status_code=429,
-        content={
-            "error": "Rate limit exceeded. Try again in 60 seconds."
-        }
+        content={"error": "Rate limit exceeded. Try again in 60 seconds."},
     )
+
 
 # react runs on port 5173 & fastapi runs on port 8000 using CORSMiddleware (Cross origin resource sharing)
 
