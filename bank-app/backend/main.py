@@ -254,6 +254,7 @@ def set_frozen(
 
 
 @app.patch("/accounts/{id}/transaction", response_model=TransactionResponse)
+@limiter.limit("100/minute")
 def transaction(
     id: int,
     transaction: AccountTransaction,
@@ -330,7 +331,7 @@ def register(request: Request, user: UserCreate, db: Session = Depends(get_db)):
 
 
 @app.post("/login", response_model=Token)
-@limiter.limit("5/minute")
+@limiter.limit("100/minute")
 def login(
     request: Request,
     db: Session = Depends(get_db),
