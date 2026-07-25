@@ -1,6 +1,7 @@
 from fastapi import Depends, FastAPI, HTTPException, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from auth import create_access_token, hash_password, verify_password, verify_token
@@ -18,7 +19,6 @@ from schemas import (
     UserResponse,
 )
 
-from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from limiter import limiter
 
@@ -59,6 +59,18 @@ Think of it like renting a car:
 
 app = FastAPI()
 
+app.state.limiter = limiter
+
+# Tells FastAPI If someone exceeds the limit, return a 429 response.
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return JSONResponse(
+        status_code=429,
+        content={
+            "error": "Rate limit exceeded. Try again in 60 seconds."
+        }
+    )
+
 # react runs on port 5173 & fastapi runs on port 8000 using CORSMiddleware (Cross origin resource sharing)
 
 app.add_middleware(
@@ -70,10 +82,6 @@ app.add_middleware(
 )
 
 # app.state as a shared storage box attached to your FastAPI app.
-app.state.limiter = limiter
-
-# Tells FastAPI If someone exceeds the limit, return a 429 response.
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 """
 oauth2_scheme = security guard at the door
@@ -298,7 +306,8 @@ def get_transactions(
 
 # since response_model=UserResponse and UserResponse schema doesn't include hashedpassword return new_user does ONLY returns whats included in UserResponse
 @app.post("/register", response_model=UserResponse)
-def register(user: UserCreate, db: Session = Depends(get_db)):
+@limiter.limit("100/minute")
+def register(request: Request, user: UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.username == user.username).first()
     existing_email = db.query(User).filter(User.email == user.email).first()
 
@@ -321,7 +330,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @app.post("/login", response_model=Token)
-@limiter.limit("100/minute")
+@limiter.limit("5/minute")
 def login(
     request: Request,
     db: Session = Depends(get_db),
