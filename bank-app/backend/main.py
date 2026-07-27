@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from auth import create_access_token, hash_password, verify_password, verify_token
 from database import SessionLocal
 from models import Account, Transaction, User
-from cache import get_cached, set_cached
+from cache import get_cached, set_cached, delete_cache
 from schemas import (
     AccountCreate,
     AccountFreeze,
@@ -160,6 +160,8 @@ def create_account(
     db.commit()
     db.refresh(new_account)
 
+    delete_cache(f"accounts:user:{current_user.id}")
+
     return new_account
 
 
@@ -168,7 +170,7 @@ def get_accounts(
     db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
 
-    key = f"accounts:user{current_user.id}"
+    key = f"accounts:user:{current_user.id}"
     cached = get_cached(key)
 
     if cached:
@@ -231,6 +233,8 @@ def update_account(
     db.commit()
     db.refresh(account)
 
+    delete_cache(f"accounts:user:{current_user.id}")
+
     return account
 
 
@@ -245,6 +249,8 @@ def delete_account(
 
     db.delete(account)
     db.commit()
+
+    delete_cache(f"accounts:user:{current_user.id}")
 
     return {"message": f"Account: {id} deleted successfully"}
 
@@ -271,6 +277,8 @@ def set_frozen(
 
     db.commit()
     db.refresh(account)
+
+    delete_cache(f"accounts:user:{current_user.id}")
 
     return account
 
@@ -310,6 +318,8 @@ def transaction(
     db.add(new_transaction)
     db.commit()
     db.refresh(account)
+
+    delete_cache(f"accounts:user:{current_user.id}")
 
     return new_transaction
 
