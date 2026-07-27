@@ -14,6 +14,6 @@ load_dotenv()
 limiter = Limiter(
     key_func=get_remote_address,  # “Use the user’s IP address to track limits.”
     storage_uri=os.getenv(  # “Where should I store request counts?”
-        "redis://localhost:6379"
+        "REDIS_URL" "redis://localhost:6379"
     ),
 )
