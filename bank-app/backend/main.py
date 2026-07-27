@@ -23,7 +23,6 @@ from schemas import (
 from slowapi.errors import RateLimitExceeded
 from limiter import limiter
 
-
 # Base.metadata.drop_all(bind=engine) #keep this for temporary use
 # Base.metadata.create_all(bind=engine) #Look at all SQLAlchemy models that inherit from Base, and create their tables in Postgres if they don’t exist.
 
@@ -168,7 +167,7 @@ def create_account(
 def get_accounts(
     db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
-    
+
     key = f"accounts:user{current_user.id}"
     cached = get_cached(key)
 
@@ -178,19 +177,18 @@ def get_accounts(
     accounts = (
         db.query(Account).filter(Account.owner_id == current_user.id).all()
     )  # “SELECT * FROM accounts INNER JOIN ON accounts.owner_id = current_user.id (Now each user only sees their own accounts)
-    
-    
+
     account_data = [
         {
             "id": acc.id,
             "owner_name": acc.owner_name,
             "account_type": acc.account_type,
             "balance": acc.balance,
-            "frozen": acc.frozen
+            "frozen": acc.frozen,
         }
         for acc in accounts
     ]
-    
+
     set_cached(key, account_data)
 
     return accounts
