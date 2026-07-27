@@ -9,19 +9,19 @@ load_dotenv()
 # with decode_responses = True -> b'{"id":1,"owner_name":"Jonathan"}'
 
 redis_client = redis.Redis(
-    host=os.getenv("REDIS_URL", "redis://redis:6379"),
-    port=6379,
-    decode_responses=True
+    host=os.getenv("REDIS_URL", "redis://redis:6379"), port=6379, decode_responses=True
 )
 
-#cache hit or miss check
+
+# cache hit or miss check
 def get_cached(key):
     cached_data = redis_client.get(key)
 
     if cached_data:
         return json.loads(cached_data)
-    
+
     return None
+
 
 """
 set_cached(
@@ -41,12 +41,9 @@ accounts:user:42
 ]
 
 
-expires in 60 secs then redis deletes it 
+expires in 60 secs then redis deletes it
 """
-def set_cached(key, value, ttl=60):
-    redis_client.set(
-        key,
-        json.dumps(value),
-        ex=ttl
-    )
 
+
+def set_cached(key, value, ttl=60):
+    redis_client.set(key, json.dumps(value), ex=ttl)
