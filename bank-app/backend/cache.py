@@ -8,9 +8,9 @@ load_dotenv()
 # without decode_responses = True -> b'{"id":1,"owner_name":"Jonathan"}'
 # with decode_responses = True -> b'{"id":1,"owner_name":"Jonathan"}'
 
-redis_client = redis.Redis(
-    host=os.getenv("REDIS_URL", "redis://redis:6379"), port=6379, decode_responses=True
-)
+redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+
+redis_client = redis.from_url(redis_url, decode_responses=True)
 
 
 # cache hit or miss check
@@ -47,3 +47,7 @@ expires in 60 secs then redis deletes it
 
 def set_cached(key, value, ttl=60):
     redis_client.set(key, json.dumps(value), ex=ttl)
+
+
+def delete_cache(key):
+    redis_client.delete(key)
