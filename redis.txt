@@ -68,3 +68,6 @@ FastAPI
 - hit -> returns that & never touches PostgreSQL
 
 - miss -> goes set_cached(key, accounts) sets a new cache that expires in 60 seconds
+
+- localhost for MAC 
+- actual name (e.g redis or db for docker)

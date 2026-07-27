@@ -233,7 +233,7 @@ def update_account(
     db.commit()
     db.refresh(account)
 
-    delete_cache(f"accounts:user:{current_user.id}")
+    delete_cache(f"accounts:user:{current_user.id}") #when user updates any acc info delete that old cache that stores old info and the stores it in the next cache miss
 
     return account
 
