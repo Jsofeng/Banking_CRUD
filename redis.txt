@@ -31,3 +31,40 @@
 
           login attempts:
           IP -> count
+
+
+GET/
+
+
+Client
+   │
+   ▼
+FastAPI
+   │
+   ├────────► Redis (cache)
+   │            ▲
+   │            │
+   │     Cached data?
+   │            │
+   │     Yes ───┘
+   │
+   └────────► PostgreSQL
+                   │
+             SQLAlchemy
+                   │
+              Database rows
+
+
+(e.g GET /accounts)
+
+- FastAPI checks cached = get_cached(key)
+- REDIS already has [
+  {
+    "id": 1,
+    "owner_name": "Jonathan",
+    "balance": 1000
+  }
+]
+- hit -> returns that & never touches PostgreSQL
+
+- miss -> goes set_cached(key, accounts) sets a new cache that expires in 60 seconds
