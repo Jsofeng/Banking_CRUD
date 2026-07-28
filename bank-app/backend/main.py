@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from auth import create_access_token, hash_password, verify_password, verify_token
 from database import SessionLocal
 from models import Account, Transaction, User
-from cache import get_cached, set_cached, delete_cache
+from redis_cache import get_cached, set_cached, delete_cache
 from schemas import (
     AccountCreate,
     AccountFreeze,
