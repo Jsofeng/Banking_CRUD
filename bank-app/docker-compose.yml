@@ -63,5 +63,19 @@ services:
     ports:
       - "6379:6379"
 
+  celery_worker:
+    build: backend
+
+    command: celery -A tasks.celery_app worker --loglevel=info
+    
+    env_file:
+      - .env.docker
+    
+    depends_on:
+      - backend
+      - redis
+
+    
+
 volumes:
   postgres_data:
