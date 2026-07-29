@@ -1,0 +1,39 @@
+A message queue lets you say "I'll do that in the background, here's your response now."
+
+Producer -> The thing that creates tasks (your API route)
+Queue -> Where tasks wait to be processed (Redis or Kafka)
+Consumer/Worker -> The thing that picks up and processes tasks
+Broker -> The middleman managing the queue (Redis in this case)
+
+Celery is Python's most popular task queue library. It uses Redis as its broker:
+
+Needs 2 things:
+
+#1: broker=the queue
+
+FastAPI
+   |
+   | "send notification"
+   ↓
+ Redis Queue
+   |
+   ↓
+ Celery Worker
+   |
+   ↓
+ send email
+
+#2: backend=stores the task result
+
+Task started
+      |
+      ↓
+Celery Worker
+      |
+      ↓
+"Notification sent"
+      |
+      ↓
+Redis stores result
+
+@celery_app.task -> “This function is not a normal Python function. Register it as a background job.” can use .delay()
