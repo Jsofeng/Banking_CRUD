@@ -1,7 +1,13 @@
 import os
 import redis
 import json
+import logging
 from dotenv import load_dotenv
+
+
+logging.basicConfig(level=logging.INFO)
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -18,8 +24,10 @@ def get_cached(key):
     cached_data = redis_client.get(key)
 
     if cached_data:
+        logger.info(f"CACHE HIT: {key}")
         return json.loads(cached_data)
 
+    logger.info(f"CACHE MISS: {key}")
     return None
 
 
@@ -50,4 +58,5 @@ def set_cached(key, value, ttl=60):
 
 
 def delete_cache(key):
+    logger.info(f"CACHE INVALIDATED: {key}")
     redis_client.delete(key)
