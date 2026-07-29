@@ -57,7 +57,6 @@ Think of it like renting a car:
 
 """
 
-
 app = FastAPI()
 
 app.state.limiter = limiter
@@ -180,6 +179,7 @@ def get_accounts(
         db.query(Account).filter(Account.owner_id == current_user.id).all()
     )  # “SELECT * FROM accounts INNER JOIN ON accounts.owner_id = current_user.id (Now each user only sees their own accounts)
 
+    # stores all current accounts associated with current_user.id as cache
     account_data = [
         {
             "id": acc.id,
@@ -187,6 +187,7 @@ def get_accounts(
             "account_type": acc.account_type,
             "balance": acc.balance,
             "frozen": acc.frozen,
+            "created_at": acc.created_at.isoformat(),
         }
         for acc in accounts
     ]
