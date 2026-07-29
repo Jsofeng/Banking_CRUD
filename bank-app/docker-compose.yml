@@ -64,7 +64,7 @@ services:
       - "6379:6379"
 
   celery_worker:
-    build: backend
+    build: ./backend
 
     command: celery -A tasks.celery_app worker --loglevel=info
     
