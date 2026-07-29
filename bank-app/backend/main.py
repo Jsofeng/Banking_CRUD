@@ -20,6 +20,8 @@ from schemas import (
     UserResponse,
 )
 
+from tasks import send_transaction_notification
+
 from slowapi.errors import RateLimitExceeded
 from limiter import limiter
 
@@ -321,6 +323,10 @@ def transaction(
     db.add(new_transaction)
     db.commit()
     db.refresh(account)
+
+    send_transaction_notification.delay(
+        current_user.id, transaction.amount, transaction.transaction_type
+    )
 
     delete_cache(f"accounts:user:{current_user.id}")
 
