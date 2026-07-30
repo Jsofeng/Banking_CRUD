@@ -18,15 +18,15 @@ class Account(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     frozen = Column(Boolean, default=False)
 
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    owner_id = Column(Integer, ForeignKey("users.id"), index=True)
 
 
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    username = Column(String(30), unique=True, nullable=False)
-    email = Column(String(255), unique=True, nullable=False)
+    username = Column(String(30), unique=True, nullable=False, index=True)
+    email = Column(String(255), unique=True, nullable=False, index=True)
     hashed_password = Column(String(255), nullable=False)
 
     role = Column(String, nullable=False, default="user")  # "user" or "admin"
