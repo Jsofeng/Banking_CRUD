@@ -22,3 +22,10 @@ def send_transaction_notification(user_id, amount, transaction_type):
     # - call another service
 
     return "Notification sent"
+
+
+@celery_app.task
+def send_registration_notification(username, email):
+    print(f"Sending email confirmation to {email} Welcome: {username}")
+
+    return "Email Verification Sent"
