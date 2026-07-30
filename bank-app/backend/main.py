@@ -20,7 +20,7 @@ from schemas import (
     UserResponse,
 )
 
-from tasks import send_transaction_notification
+from tasks import send_transaction_notification, send_registration_notification
 
 from slowapi.errors import RateLimitExceeded
 from limiter import limiter
@@ -369,6 +369,7 @@ def register(request: Request, user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
+    send_registration_notification.delay(user.username, user.email)
     return new_user
 
 
