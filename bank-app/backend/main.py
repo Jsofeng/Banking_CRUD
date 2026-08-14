@@ -25,7 +25,7 @@ from tasks import send_transaction_notification, send_registration_notification
 from slowapi.errors import RateLimitExceeded
 from limiter import limiter
 
-Base.metadata.drop_all(bind=engine)  # keep this for temporary use
+# Base.metadata.drop_all(bind=engine)  # keep this for temporary use
 # Base.metadata.create_all(bind=engine) #Look at all SQLAlchemy models that inherit from Base, and create their tables in Postgres if they don’t exist.
 
 """
@@ -134,7 +134,7 @@ def require_admin(current_user: User = Depends(get_current_user)):
 # HELPER FUNCTION
 def get_account(id: int, db: Session, current_user: User) -> Account:
 
-    key = f"accounts:user:{current_user.id}"
+    key = f"accounts:user:{current_user.id}:account:{id}"
     cached = get_cached(key)
 
     if cached:
@@ -161,7 +161,7 @@ def get_account(id: int, db: Session, current_user: User) -> Account:
 
     set_cached(key, account_data)
 
-    return account
+    return account_data
 
 
 @app.post("/accounts", response_model=AccountResponse)
