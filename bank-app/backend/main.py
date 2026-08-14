@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from auth import create_access_token, hash_password, verify_password, verify_token
-from database import SessionLocal
+from database import SessionLocal, engine, Base
 from models import Account, Transaction, User
 from redis_cache import get_cached, set_cached, delete_cache
 from schemas import (
@@ -25,7 +25,7 @@ from tasks import send_transaction_notification, send_registration_notification
 from slowapi.errors import RateLimitExceeded
 from limiter import limiter
 
-# Base.metadata.drop_all(bind=engine) #keep this for temporary use
+Base.metadata.drop_all(bind=engine)  # keep this for temporary use
 # Base.metadata.create_all(bind=engine) #Look at all SQLAlchemy models that inherit from Base, and create their tables in Postgres if they don’t exist.
 
 """
@@ -133,13 +133,33 @@ def require_admin(current_user: User = Depends(get_current_user)):
 
 # HELPER FUNCTION
 def get_account(id: int, db: Session, current_user: User) -> Account:
+
+    key = f"accounts:user:{current_user.id}"
+    cached = get_cached(key)
+
+    if cached:
+        return cached
+
     account = (
         db.query(Account)
         .filter(Account.id == id, Account.owner_id == current_user.id)
         .first()
     )  # ensures current id matches Account.id and foreign key matches User.id
+
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
+
+    account_data = {
+        "id": account.id,
+        "owner_name": account.owner_name,
+        "account_type": account.account_type,
+        "balance": account.balance,
+        "created_at": account.created_at.isoformat(),
+        "frozen": account.frozen,
+        "owner_id": account.owner_id,
+    }
+
+    set_cached(key, account_data)
 
     return account
 
