@@ -142,17 +142,7 @@ def get_account(id: int, db: Session, current_user: User) -> Account:
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
 
-    account_data = {
-        "id": account.id,
-        "owner_name": account.owner_name,
-        "account_type": account.account_type,
-        "balance": account.balance,
-        "created_at": account.created_at.isoformat(),
-        "frozen": account.frozen,
-        "owner_id": account.owner_id,
-    }
-
-    return account_data
+    return account
 
 
 @app.post("/accounts", response_model=AccountResponse)
