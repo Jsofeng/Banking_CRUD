@@ -133,13 +133,6 @@ def require_admin(current_user: User = Depends(get_current_user)):
 
 # HELPER FUNCTION
 def get_account(id: int, db: Session, current_user: User) -> Account:
-
-    key = f"accounts:user:{current_user.id}:account:{id}"
-    cached = get_cached(key)
-
-    if cached:
-        return cached
-
     account = (
         db.query(Account)
         .filter(Account.id == id, Account.owner_id == current_user.id)
@@ -158,8 +151,6 @@ def get_account(id: int, db: Session, current_user: User) -> Account:
         "frozen": account.frozen,
         "owner_id": account.owner_id,
     }
-
-    set_cached(key, account_data)
 
     return account_data
 
