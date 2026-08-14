@@ -38,10 +38,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r backend/requirements.txt
+          pip install -r bank-app/backend/requirements.txt
 
       - name: Run migrations
-        working-directory: bank-appbackend
+        working-directory: bank-app/backend
         env:
           ALEMBIC_DATABASE_URL: postgresql://postgres:password@localhost:5432/bank_app
         run: alembic upgrade head
