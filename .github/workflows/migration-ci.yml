@@ -1,3 +1,48 @@
-- name: Run Migrations
-  run: alembic upgrade head
-  working-directory: bank-app/backend
+name: Run Migrations
+
+on:
+  push:
+    branches: [main]
+
+  pull_request:
+    branches: [main]
+
+jobs:
+  migrations:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: bank_app
+        ports:
+          - 5432:5432
+
+        options: >-
+          --health-cmd "pg_isready -U postgres -d bank_app"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      ALEMBIC_DATABASE_URL: postgresql://postgres:password@localhost:5432/bank_app
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+        working-directory: bank-app/backend
+
+      - name: Run migrations
+        run: alembic upgrade head
+        working-directory: bank-app/backend
