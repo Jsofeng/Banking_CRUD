@@ -1,0 +1,3 @@
+- name: Run Migrations
+  run: alembic upgrade head
+  working-directory: bank-app/backend
