@@ -15,12 +15,12 @@ load_dotenv()
 # access to the values within the .ini file in use.
 config = context.config
 
-database_url = os.getenv("DATABASE_URL")
+database_url = os.getenv("ALEMBIC_DATABASE_URL")
 
 if not database_url:
     raise RuntimeError("DATABASE_URL is not set")
 
-config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL"))
+config.set_main_option("sqlalchemy.url", database_url)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
