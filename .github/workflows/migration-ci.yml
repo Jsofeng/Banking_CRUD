@@ -44,5 +44,6 @@ jobs:
       - name: Run migrations
         working-directory: bank-app/backend
         env:
+          DATABASE_URL: postgresql://postgres:password@localhost:5432/bank_app
           ALEMBIC_DATABASE_URL: postgresql://postgres:password@localhost:5432/bank_app
         run: alembic upgrade head
