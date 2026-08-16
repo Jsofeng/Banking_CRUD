@@ -20,7 +20,9 @@ database_url = os.getenv("ALEMBIC_DATABASE_URL")
 if not database_url:
     raise RuntimeError("DATABASE_URL is not set")
 
-config.set_main_option("sqlalchemy.url", database_url)
+config.set_main_option(
+    "sqlalchemy.url", database_url
+)  # config.set_main_option(key, value)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
