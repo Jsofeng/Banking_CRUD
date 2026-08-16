@@ -54,7 +54,7 @@ expires in 60 secs then redis deletes it
 
 
 def set_cached(key, value, ttl=60):
-    redis_client.set(key, json.dumps(value), ex=ttl)
+    redis_client.set(key, json.dumps(value, default=str), ex=ttl)
 
 
 def delete_cache(key):
