@@ -1,6 +1,7 @@
 import pytest
 from uuid import UUID, uuid4
 
+
 @pytest.mark.asyncio
 async def test_create_account(client, authenticated_user):
     response = await client.post(
@@ -137,7 +138,6 @@ async def test_account_id_match(client, authenticated_user):
     assert body["owner_name"] == "test_user"
     assert body["balance"] == 1000.0
     assert body["account_type"] == "checking"
-
 
 
 @pytest.mark.asyncio
