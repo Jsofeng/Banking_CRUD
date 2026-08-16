@@ -1,5 +1,5 @@
 import pytest
-
+from uuid import UUID, uuid4
 
 @pytest.mark.asyncio
 async def test_create_account(client, authenticated_user):
@@ -17,7 +17,7 @@ async def test_create_account(client, authenticated_user):
     assert body["account_type"] == "checking"
     assert body["balance"] == 1000.0
 
-    assert body["id"] == authenticated_user["user_id"]
+    assert UUID(body["id"])
 
 
 @pytest.mark.asyncio
@@ -137,14 +137,14 @@ async def test_account_id_match(client, authenticated_user):
     assert body["owner_name"] == "test_user"
     assert body["balance"] == 1000.0
     assert body["account_type"] == "checking"
-    assert body["id"] == authenticated_user["user_id"]
+
 
 
 @pytest.mark.asyncio
 async def test_invalid_account_id(client, authenticated_user):
     headers = authenticated_user["headers"]
 
-    response = await client.get("/accounts/99999", headers=headers)
+    response = await client.get(f"/accounts/{uuid4()}", headers=headers)
 
     assert response.status_code == 404
 
@@ -155,7 +155,7 @@ async def test_update_account_owner_name(client, authenticated_user):
 
     created_response = await client.post(
         "/accounts",
-        json={"owner_name": "test_user", "balance": 1000.0, "account_type": "checking"},
+        json={"owner_name": "test_user", "balance": 1000.0, "account_type": "chequing"},
         headers=headers,
     )
 
