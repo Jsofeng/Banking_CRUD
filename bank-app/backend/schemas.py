@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import Optional
+from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 """
 SQLAlchemy defines what the db table looks like
@@ -31,15 +32,14 @@ class AccountUpdate(BaseModel):
 
 
 class AccountResponse(BaseModel):  # what the api sends back
-    id: int
+    id: UUID
     owner_name: str
     account_type: str
     balance: int
     frozen: bool
     created_at: datetime
 
-    class Config:  # This lets Pydantic read SQLAlchemy objects directly instead of only reading plain dictionaries.
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AccountTransaction(BaseModel):
@@ -48,14 +48,13 @@ class AccountTransaction(BaseModel):
 
 
 class TransactionResponse(BaseModel):
-    id: int
-    account_id: int
+    id: UUID
+    account_id: UUID
     transaction_type: str
     amount: float
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AccountFreeze(BaseModel):
@@ -72,14 +71,13 @@ class UserCreate(BaseModel):
 
 
 class UserResponse(BaseModel):
-    id: int
+    id: UUID
     username: str
     email: str
     role: str
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # <---------------- TOKEN ---------------->
