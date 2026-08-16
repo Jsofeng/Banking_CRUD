@@ -1,3 +1,4 @@
+from uuid import UUID
 from fastapi import Depends, FastAPI, HTTPException, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -132,7 +133,7 @@ def require_admin(current_user: User = Depends(get_current_user)):
 
 
 # HELPER FUNCTION
-def get_account(id: int, db: Session, current_user: User) -> Account:
+def get_account(id: UUID, db: Session, current_user: User) -> Account:
     account = (
         db.query(Account)
         .filter(Account.id == id, Account.owner_id == current_user.id)
@@ -202,7 +203,7 @@ def get_accounts(
 
 @app.get("/accounts/{id}", response_model=AccountResponse)
 def get_account_id(
-    id: int,
+    id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -214,7 +215,7 @@ def get_account_id(
 # IMPLEMENT TO ACCOUNTCARD
 @app.put("/accounts/{id}", response_model=AccountResponse)
 def update_account(
-    id: int,
+    id: UUID,
     updated_data: AccountUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -246,7 +247,7 @@ def update_account(
 
 @app.delete("/accounts/{id}")
 def delete_account(
-    id: int,
+    id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -265,7 +266,7 @@ def delete_account(
     "/accounts/{id}/set_freeze", response_model=AccountResponse
 )  # allows for partial updates instead of whole object updating like PUT
 def set_frozen(
-    id: int,
+    id: UUID,
     request: AccountFreeze,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -293,7 +294,7 @@ def set_frozen(
 @limiter.limit("100/minute")
 def transaction(
     request: Request,
-    id: int,
+    id: UUID,
     transaction: AccountTransaction,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -336,7 +337,7 @@ def transaction(
 
 @app.get("/accounts/{id}/transaction", response_model=list[TransactionResponse])
 def get_transactions(
-    id: int,
+    id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
