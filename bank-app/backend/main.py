@@ -1,5 +1,5 @@
 from uuid import UUID
-from fastapi import Depends, FastAPI, HTTPException, status, Request
+from fastapi import Depends, FastAPI, HTTPException, status, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
@@ -298,8 +298,22 @@ def transaction(
     transaction: AccountTransaction,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
+    idempotency_key: str = Header(...),
 ):
     account = get_account(id, db, current_user)
+
+    existing_transaction = (
+        db.query(Transaction)
+        .filter(Transaction.idempotency_key == idempotency_key)
+        .first()
+    )
+
+    if (
+        existing_transaction
+    ):  # if that transaction was already complete return IMMEDIATELY
+        return existing_transaction
+
+    balance_before = account.balance
 
     if account.frozen:
         raise HTTPException(status_code=400, detail="Account is currently frozen")
@@ -320,11 +334,15 @@ def transaction(
         account_id=account.id,
         transaction_type=transaction.transaction_type,
         amount=transaction.amount,
+        balance_before=balance_before,
+        balance_after=account.balance,
+        status="completed",
+        idempotency_key=idempotency_key,
     )
 
     db.add(new_transaction)
     db.commit()
-    db.refresh(account)
+    db.refresh(new_transaction)
 
     send_transaction_notification.delay(
         current_user.id, transaction.amount, transaction.transaction_type
