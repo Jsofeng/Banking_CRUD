@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
+from decimal import Decimal
 
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -43,7 +44,7 @@ class AccountResponse(BaseModel):  # what the api sends back
 
 
 class AccountTransaction(BaseModel):
-    amount: int = Field(ge=0)
+    amount: Decimal = Field(ge=0)
     transaction_type: str
 
 
@@ -52,6 +53,8 @@ class TransactionResponse(BaseModel):
     account_id: UUID
     transaction_type: str
     amount: float
+    balance_before: float
+    balance_after: float
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
