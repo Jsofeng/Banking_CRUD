@@ -1,11 +1,8 @@
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from main import get_db
 
 
-@pytest.mark.asyncio
 def test_get_db_yields_session_and_closes():
 
     mock_db = MagicMock()  # creates a fake database connection
