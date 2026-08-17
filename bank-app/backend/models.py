@@ -94,6 +94,16 @@ class Transaction(Base):
 
     amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
 
+    balance_before: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+
+    balance_after: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+
+    status: Mapped[str] = mapped_column(String(12), nullable=False, default="pending")
+
+    idempotency_key: Mapped[str] = mapped_column(
+        String(255), unique=True, nullable=False, index=True
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
