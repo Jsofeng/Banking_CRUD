@@ -1,4 +1,5 @@
 from uuid import UUID
+from decimal import Decimal
 from fastapi import Depends, FastAPI, HTTPException, status, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -17,11 +18,13 @@ from schemas import (
     AccountUpdate,
     Token,
     TransactionResponse,
+    DepositRequest,
     UserCreate,
     UserResponse,
 )
 
 from tasks import send_transaction_notification, send_registration_notification
+from services import deposit
 
 from slowapi.errors import RateLimitExceeded
 from limiter import limiter
@@ -288,6 +291,20 @@ def set_frozen(
     delete_cache(f"accounts:user:{current_user.id}")
 
     return account
+
+
+@app.patch("/accounts/{id}/deposit", response_model=TransactionResponse)
+@limiter.limit("100/minute")
+def deposit_transaction(
+    request: Request,
+    id: UUID,
+    transaction: DepositRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    account = get_account(id, db, current_user)
+
+    return deposit(db, account.id, transaction.amount, transaction.idempotency_key)
 
 
 @app.patch("/accounts/{id}/transaction", response_model=TransactionResponse)
