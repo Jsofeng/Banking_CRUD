@@ -10,7 +10,10 @@ from sqlalchemy.orm import sessionmaker
 
 from database import Base
 from main import app, get_db
-from models import User
+from models import User, Account
+from datetime import datetime
+from uuid import uuid4
+from decimal import Decimal
 
 load_dotenv()
 
@@ -80,3 +83,38 @@ async def authenticated_user(client: AsyncClient, db):
     token = login_response.json()["access_token"]
 
     return {"headers": {"Authorization": f"Bearer {token}"}, "user_id": user.id}
+
+
+@pytest_asyncio.fixture
+async def create_user(db):
+    user = User(
+        id=uuid4(),
+        username="testuser",
+        email="test@example.com",
+        hashed_password="password",
+        role="user",
+        created_at=datetime.utcnow(),
+    )
+
+    db.add(user)
+    db.commit()
+
+    return user
+
+
+@pytest_asyncio.fixture
+async def create_account(db, create_user):
+    account = Account(
+        id=uuid4(),
+        owner_name="test_user",
+        account_type="chequing",
+        balance=Decimal("100.00"),
+        created_at=datetime.utcnow(),
+        frozen=False,
+        owner_id=create_user.id,
+    )
+
+    db.add(account)
+    db.commit()
+
+    return account
