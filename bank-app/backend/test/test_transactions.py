@@ -7,7 +7,11 @@ async def test_get_transactions(client, authenticated_user):
 
     created_response = await client.post(
         "/accounts",
-        json={"owner_name": "test_user", "balance": 1000.0, "account_type": "chequing"},
+        json={
+            "owner_name": "test_user",
+            "balance": 1000.00,
+            "account_type": "chequing",
+        },
         headers=headers,
     )
 
@@ -22,7 +26,7 @@ async def test_get_transactions(client, authenticated_user):
 
     transaction1 = await client.patch(
         f"/accounts/{account_id}/transaction",
-        json={"amount": 1000.0, "transaction_type": "deposit"},
+        json={"amount": 1000.00, "transaction_type": "deposit"},
         headers=transaction1_headers,
     )
 
@@ -35,7 +39,7 @@ async def test_get_transactions(client, authenticated_user):
 
     transaction2 = await client.patch(
         f"/accounts/{account_id}/transaction",
-        json={"amount": 100.0, "transaction_type": "withdrawal"},
+        json={"amount": 100.00, "transaction_type": "withdrawal"},
         headers=transaction2_headers,
     )
 
@@ -46,17 +50,17 @@ async def test_get_transactions(client, authenticated_user):
     transactions = response.json()
 
     assert len(transactions) == 2
-    assert transactions[0]["amount"] == 1000.0
+    assert transactions[0]["amount"] == "1000.00"
     assert transactions[0]["transaction_type"] == "deposit"
     assert transactions[0]["account_id"] == account_id
-    assert transactions[0]["balance_before"] == 1000.0
-    assert transactions[0]["balance_after"] == 2000.0
+    assert transactions[0]["balance_before"] == "1000.00"
+    assert transactions[0]["balance_after"] == "2000.00"
 
-    assert transactions[1]["amount"] == 100.0
+    assert transactions[1]["amount"] == "100.00"
     assert transactions[1]["transaction_type"] == "withdrawal"
     assert transactions[1]["account_id"] == account_id
-    assert transactions[1]["balance_before"] == 2000.0
-    assert transactions[1]["balance_after"] == 1900.0
+    assert transactions[1]["balance_before"] == "2000.00"
+    assert transactions[1]["balance_after"] == "1900.00"
 
 
 @pytest.mark.asyncio
