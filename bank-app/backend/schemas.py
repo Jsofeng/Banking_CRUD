@@ -14,7 +14,7 @@ Pydantic defines what data coming in & out of your API looks like
 class AccountCreate(BaseModel):
     owner_name: str = Field(min_length=1)
     account_type: str = "chequing"
-    balance: int = Field(ge=0)
+    balance: Decimal = Field(ge=0)
 
 
 """
@@ -28,7 +28,7 @@ User can update only what they want
 class AccountUpdate(BaseModel):
     owner_name: Optional[str] = None
     account_type: Optional[str] = None
-    balance: Optional[int] = None
+    balance: Optional[Decimal] = None
     frozen: Optional[bool] = None
 
 
@@ -36,7 +36,7 @@ class AccountResponse(BaseModel):  # what the api sends back
     id: UUID
     owner_name: str
     account_type: str
-    balance: int
+    balance: Decimal
     frozen: bool
     created_at: datetime
 
@@ -62,9 +62,9 @@ class TransactionResponse(BaseModel):
     id: UUID
     account_id: UUID
     transaction_type: str
-    amount: float
-    balance_before: float
-    balance_after: float
+    amount: Decimal
+    balance_before: Decimal
+    balance_after: Decimal
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
