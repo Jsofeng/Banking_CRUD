@@ -4,26 +4,27 @@ import { authFetch } from "../utils/authFetch";
 import TransactionList from "./TransactionList";
 import { API_URL } from "../config";
 
-function AccountCard({ account, onDelete, onEdit }) {
+function AccountCard({ account, onDelete, onEdit, onDeposit, onWithdrawal}) {
    const [editing, setEditing] = useState(false);
 
    const [ownerName, setOwnerName] = useState(account.owner_name);
    const [accountType, setAccountType] = useState(account.account_type);
    
    const [amount, setAmount] = useState("");
-   const [type, setType] = useState("deposit");
    const [showTransactions, setShowTransactions] = useState(false);
 
    //above -> only use const [..., ...] = useState() when user is interacting with it (input fields, dropdowns checkboxes, temporary UI changes)
    // DO NOT USE IT when the backend owns it (e.g account.frozen, account.balance, account.account_type)
-   const handleTransaction = async () => {
+   const handleDeposit = async () => {
     try {
         if (!amount) return;
         /* converts newBalance to int -> json string -> backend -> pydantic converts json string to int -> postgres table
             async allows you to compute other stuff and then when that part of the code is finished computing come back to it 
         */
-    
-        const response = await authFetch(`${API_URL}/accounts/${account.id}/transaction`, 
+        
+        const idempotencyKey = crypto.randomUUID();
+
+        const response = await authFetch(`${API_URL}/accounts/${account.id}/deposit`, 
             {
                 method: "PATCH",
                 headers: {
@@ -31,7 +32,7 @@ function AccountCard({ account, onDelete, onEdit }) {
                 },
                 body: JSON.stringify({
                     amount: Number(amount),
-                    transaction_type: type,
+                    idempotency_key : idempotencyKey
                 }),
             }    
         );
@@ -40,10 +41,10 @@ function AccountCard({ account, onDelete, onEdit }) {
             throw new Error("Transaction Failed");
         }
 
-        const updatedAccount = await response.json();
+        const transaction = await response.json();
         // <Account onEdit={handleEdit} />
         // calls parent class (AccountList) and says “Hey parent component, here is the latest version of the account. Update yourself.”
-        onEdit(updatedAccount); 
+        onDeposit(transaction); 
         
         setAmount("");
 
@@ -53,6 +54,40 @@ function AccountCard({ account, onDelete, onEdit }) {
     }
 
     };
+
+    const handleWithdrawal = async () => {
+        try {
+
+            const idempotencyKey = crypto.randomUUID()
+            
+            const response = await authFetch(
+                `${API_URL}/accounts/${account.id}/withdrawal`, {
+                    method : "PATCH",
+                    headers : {
+                        "Content-Type" : "application/json"
+                    },
+                    body : JSON.stringify({
+                        amount : Number(amount),
+                        idempotency_key: idempotencyKey
+                    }),
+                }
+            )
+
+            if (!response.ok) {
+                throw new Error("Transaction Failed");
+            }
+
+            const transaction = await response.json();
+
+            onWithdrawal(transaction);
+            
+            setAmount("")
+        } catch (error) {
+            alert("Transaction Failed. Try again.");
+            console.error(error);
+        }
+    };
+    
     //toggle button so that if your account is frozen then you can only unfreeze it vice versa
     const handleFreeze = async () => {
         try {
@@ -181,17 +216,15 @@ function AccountCard({ account, onDelete, onEdit }) {
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)} //when user types in the box amount=setAmount(e.target.value)
             />
-            <select
-                value={type}
-                onChange={(e) => setType(e.target.value)} // GRAB transaction_type FIRST then onClick={handelTransaction} connects to backend with choice
-            >
-                <option value="deposit">Deposit</option>
-                <option value="withdrawal">Withdraw</option>
-            </select>
-            <button onClick={handleTransaction}> 
-                Submit Transaction 
+ 
+            <button onClick={handleDeposit}>
+                Deposit
             </button>
-            
+ 
+            <button onClick={handleWithdrawal}>
+                Withdrawal
+            </button>
+
             <button onClick={() => setShowTransactions(!showTransactions)}>{showTransactions ? "Hide Transaction History" : "Transaction History"}</button> 
             <button onClick={handleFreeze}>{account.frozen ? "Unfreeze Account" : "Freeze"}</button>
             { editing ? (
