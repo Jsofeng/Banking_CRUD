@@ -3,6 +3,7 @@ from uuid import uuid4
 from services import withdrawal
 import pytest
 
+
 def test_services_withdrawal(db, create_account):
     account = create_account
 
@@ -10,7 +11,7 @@ def test_services_withdrawal(db, create_account):
         db=db,
         account_id=account.id,
         amount=Decimal("100.00"),
-        idempotency_key="test-withdrawal-001"
+        idempotency_key="test-withdrawal-001",
     )
 
     assert transaction.amount == Decimal("100.00")
@@ -23,6 +24,7 @@ def test_services_withdrawal(db, create_account):
     db.refresh(account)
     assert account.balance == Decimal("0.00")
 
+
 def test_services_withdrawal_insufficient_amount(db, create_account):
     account = create_account
     with pytest.raises(ValueError, match="Insufficient funds"):
@@ -30,6 +32,5 @@ def test_services_withdrawal_insufficient_amount(db, create_account):
             db=db,
             account_id=account.id,
             amount=Decimal("101.00"),
-            idempotency_key="test-withdrawal-001"
+            idempotency_key="test-withdrawal-001",
         )
-

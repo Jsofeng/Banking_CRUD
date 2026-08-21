@@ -19,12 +19,13 @@ from schemas import (
     Token,
     TransactionResponse,
     DepositRequest,
+    WithdrawalRequest,
     UserCreate,
     UserResponse,
 )
 
 from tasks import send_transaction_notification, send_registration_notification
-from services import deposit
+from services import deposit, withdrawal
 
 from slowapi.errors import RateLimitExceeded
 from limiter import limiter
@@ -305,6 +306,20 @@ def deposit_transaction(
     account = get_account(id, db, current_user)
 
     return deposit(db, account.id, transaction.amount, transaction.idempotency_key)
+
+
+@app.patch("accounts/{id}/withdrawal", response_model=TransactionResponse)
+@limiter.limit("100/minute")
+def withdrawal_transaction(
+    request: Request,
+    id: UUID,
+    transaction: WithdrawalRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    account = get_account(id, db, current_user)
+
+    return withdrawal(db, account.id, transaction.amount, transaction.idempotency_key)
 
 
 @app.patch("/accounts/{id}/transaction", response_model=TransactionResponse)
