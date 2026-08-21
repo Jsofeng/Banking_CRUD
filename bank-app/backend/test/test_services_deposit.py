@@ -3,7 +3,7 @@ from uuid import uuid4
 from datetime import datetime
 import pytest
 
-from models import Account, Transaction, User
+from models import Transaction
 from services import deposit
 
 
