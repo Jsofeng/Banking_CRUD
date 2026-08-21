@@ -40,6 +40,37 @@ function AccountList() {
         );
     };
 
+    const handleDeposit = (transaction) => {
+        setAccounts(prevAccounts =>
+            prevAccounts.map(acc =>
+                acc.id === transaction.account_id
+                    ? {
+                        ...acc,
+                        balance: transaction.balance_after
+                    }
+                    : acc
+            )
+        );
+    };
+
+    /*
+    "When a withdrawal succeeds, look through all my accounts. Find the account that the transaction belongs to. 
+    Make a copy of that account, replace its balance with the backend's balance_after, and leave every other account unchanged."
+    - RETRIEVES INFO FROM BACKEND CALL FROM ACCOUNTCARD & USES THAT INFO TO UPDATE ACCOUNT
+    */
+    const handleWithdrawal = (transaction) => {
+        setAccounts(prevAccounts =>
+            prevAccounts.map(acc =>
+                acc.id === transaction.account_id
+                    ? {
+                        ...acc,
+                        balance: transaction.balance_after
+                    }
+                    : acc
+            )
+        );
+    };
+
     return (
     <div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -52,6 +83,8 @@ function AccountList() {
                 account={account}
                 onDelete={handleDelete}
                 onEdit={handleEdit}
+                onDeposit={handleDeposit}
+                onWithdrawal={handleWithdrawal}
             />
         ))}
     </div>
