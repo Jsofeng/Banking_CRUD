@@ -6,7 +6,7 @@ from uuid import UUID, uuid4
 async def test_create_account(client, authenticated_user):
     response = await client.post(
         "/accounts",
-        json={"owner_name": "Joe", "balance": 1000.0, "account_type": "checking"},
+        json={"owner_name": "Joe", "balance": 1000.00, "account_type": "checking"},
         headers=authenticated_user["headers"],
     )
 
@@ -16,7 +16,7 @@ async def test_create_account(client, authenticated_user):
 
     assert body["owner_name"] == "Joe"
     assert body["account_type"] == "checking"
-    assert body["balance"] == 1000.0
+    assert body["balance"] == "1000.00"
 
     assert UUID(body["id"])
 
@@ -118,7 +118,11 @@ async def test_account_id_match(client, authenticated_user):
 
     created_response = await client.post(
         "/accounts",
-        json={"owner_name": "test_user", "balance": 1000.0, "account_type": "checking"},
+        json={
+            "owner_name": "test_user",
+            "balance": 1000.00,
+            "account_type": "checking",
+        },
         headers=headers,
     )
 
@@ -136,7 +140,7 @@ async def test_account_id_match(client, authenticated_user):
 
     assert body["id"] == account_id
     assert body["owner_name"] == "test_user"
-    assert body["balance"] == 1000.0
+    assert body["balance"] == "1000.00"
     assert body["account_type"] == "checking"
 
 
@@ -215,7 +219,7 @@ async def test_update_account_balance(client, authenticated_user):
     response = await client.put(
         f"/accounts/{account_id}",
         json={
-            "balance": 100000.0,
+            "balance": 100000.00,
         },
         headers=headers,
     )
@@ -224,7 +228,7 @@ async def test_update_account_balance(client, authenticated_user):
 
     new_balance = response.json()["balance"]
 
-    assert new_balance == 100000.0
+    assert new_balance == "100000.00"
 
 
 @pytest.mark.asyncio
