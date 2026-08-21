@@ -308,7 +308,7 @@ def deposit_transaction(
     return deposit(db, account.id, transaction.amount, transaction.idempotency_key)
 
 
-@app.patch("accounts/{id}/withdrawal", response_model=TransactionResponse)
+@app.patch("/accounts/{id}/withdrawal", response_model=TransactionResponse)
 @limiter.limit("100/minute")
 def withdrawal_transaction(
     request: Request,
