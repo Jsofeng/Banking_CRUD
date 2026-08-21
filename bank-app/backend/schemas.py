@@ -53,6 +53,11 @@ class DepositRequest(BaseModel):
     idempotency_key: str
 
 
+class WithdrawalRequest(BaseModel):
+    amount: Decimal = Field(gt=0)
+    idempotency_key: str
+
+
 class TransactionResponse(BaseModel):
     id: UUID
     account_id: UUID
