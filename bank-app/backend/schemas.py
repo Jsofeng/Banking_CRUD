@@ -58,6 +58,13 @@ class WithdrawalRequest(BaseModel):
     idempotency_key: str
 
 
+class TransferRequest(BaseModel):
+    from_account: UUID
+    to_account: UUID
+    amount: Decimal
+    idempotency_key: str
+
+
 class TransactionResponse(BaseModel):
     id: UUID
     account_id: UUID

@@ -20,12 +20,13 @@ from schemas import (
     TransactionResponse,
     DepositRequest,
     WithdrawalRequest,
+    TransferRequest,
     UserCreate,
     UserResponse,
 )
 
 from tasks import send_transaction_notification, send_registration_notification
-from services import deposit, withdrawal
+from services import deposit, withdrawal, transfer
 
 from slowapi.errors import RateLimitExceeded
 from limiter import limiter
@@ -322,67 +323,20 @@ def withdrawal_transaction(
     return withdrawal(db, account.id, transaction.amount, transaction.idempotency_key)
 
 
-@app.patch("/accounts/{id}/transaction", response_model=TransactionResponse)
+@app.patch("/accounts/{id}/transfer", response_model=list[TransactionResponse])
 @limiter.limit("100/minute")
-def transaction(
+def transfer_transaction(
     request: Request,
-    id: UUID,
-    transaction: AccountTransaction,
+    transaction: TransferRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
-    idempotency_key: str = Header(...),
 ):
-    account = get_account(id, db, current_user)
+    from_account = get_account(transaction.from_account, db, current_user)
+    to_account = db.query(Account).filter(Account.id == transaction.to_account).first()
 
-    existing_transaction = (
-        db.query(Transaction)
-        .filter(Transaction.idempotency_key == idempotency_key)
-        .first()
+    return transfer(
+        db, from_account, to_account, transaction.amount, transaction.idempotency_key
     )
-
-    if (
-        existing_transaction
-    ):  # if that transaction was already complete return IMMEDIATELY
-        return existing_transaction
-
-    balance_before = account.balance
-
-    if account.frozen:
-        raise HTTPException(status_code=400, detail="Account is currently frozen")
-
-    if transaction.transaction_type == "deposit":
-        account.balance += transaction.amount
-
-    elif transaction.transaction_type == "withdrawal":
-        if transaction.amount > account.balance:
-            raise HTTPException(status_code=400, detail="Insufficient funds")
-
-        account.balance -= transaction.amount
-
-    else:
-        raise HTTPException(status_code=400, detail="Invalid transaction type")
-
-    new_transaction = Transaction(
-        account_id=account.id,
-        transaction_type=transaction.transaction_type,
-        amount=transaction.amount,
-        balance_before=balance_before,
-        balance_after=account.balance,
-        status="completed",
-        idempotency_key=idempotency_key,
-    )
-
-    db.add(new_transaction)
-    db.commit()
-    db.refresh(new_transaction)
-
-    send_transaction_notification.delay(
-        current_user.id, transaction.amount, transaction.transaction_type
-    )
-
-    delete_cache(f"accounts:user:{current_user.id}")
-
-    return new_transaction
 
 
 @app.get("/accounts/{id}/transaction", response_model=list[TransactionResponse])

@@ -86,6 +86,10 @@ class Transaction(Base):
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
 
+    transfer_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("transfers.id"), nullable=True
+    )
+
     account_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("accounts.id"), nullable=False, index=True
     )
@@ -100,16 +104,47 @@ class Transaction(Base):
 
     status: Mapped[str] = mapped_column(String(12), nullable=False, default="pending")
 
-    idempotency_key: Mapped[str] = mapped_column(
-        String(255), unique=True, nullable=False, index=True
-    )
-
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
+    idempotency_key: Mapped[str | None] = mapped_column(
+        String(255), unique=True, nullable=True, index=True
+    )  # temporary until we add Operations/Payment table
+
     account: Mapped["Account"] = relationship(back_populates="transactions")
+    transfer: Mapped["Transfer | None"] = relationship(back_populates="transactions")
 
     __table_args__ = (
         CheckConstraint("amount > 0", name="check_transaction_amount_positive"),
     )
+
+
+class Transfer(Base):
+    __tablename__ = "transfers"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+
+    idempotency_key: Mapped[str] = mapped_column(
+        String(255), unique=True, nullable=False, index=True
+    )
+
+    from_account_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("accounts.id"), nullable=False
+    )
+
+    to_account_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("accounts.id"), nullable=False
+    )
+
+    amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+
+    status: Mapped[str] = mapped_column(String(12), nullable=False, default="pending")
+
+    from_account: Mapped["Account"] = relationship(foreign_keys=[from_account_id])
+
+    to_account: Mapped["Account"] = relationship(foreign_keys=[to_account_id])
+
+    transactions: Mapped[list["Transaction"]] = relationship(back_populates="transfer")
