@@ -108,7 +108,9 @@ class Transaction(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
-    idempotency_key: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True, index=True) #temporary until we add Operations/Payment table
+    idempotency_key: Mapped[str | None] = mapped_column(
+        String(255), unique=True, nullable=True, index=True
+    )  # temporary until we add Operations/Payment table
 
     account: Mapped["Account"] = relationship(back_populates="transactions")
     transfer: Mapped["Transfer | None"] = relationship(back_populates="transactions")
