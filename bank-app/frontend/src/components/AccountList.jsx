@@ -71,6 +71,24 @@ function AccountList() {
         );
     };
 
+    const handleTransfer = (transactions) => {
+    setAccounts(prevAccounts =>
+        prevAccounts.map(acc => {
+            const transaction = transactions.find(
+                transaction => transaction.account_id === acc.id
+            );
+
+            return transaction
+                ? {
+                    ...acc,
+                    balance: transaction.balance_after
+                }
+                : acc;
+            })
+        );
+    };
+
+
     return (
     <div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -85,6 +103,7 @@ function AccountList() {
                 onEdit={handleEdit}
                 onDeposit={handleDeposit}
                 onWithdrawal={handleWithdrawal}
+                onTransfer={handleTransfer}
             />
         ))}
     </div>
