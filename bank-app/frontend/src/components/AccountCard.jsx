@@ -4,14 +4,18 @@ import { authFetch } from "../utils/authFetch";
 import TransactionList from "./TransactionList";
 import { API_URL } from "../config";
 
-function AccountCard({ account, onDelete, onEdit, onDeposit, onWithdrawal}) {
+function AccountCard({ account, onDelete, onEdit, onDeposit, onWithdrawal, onTransfer}) {
    const [editing, setEditing] = useState(false);
 
    const [ownerName, setOwnerName] = useState(account.owner_name);
    const [accountType, setAccountType] = useState(account.account_type);
-   
+   const [recipientAccounts, setRecipientAccounts] = useState([]);
+   const [selectedAccount, setSelectedAccount] = useState("");
+   const [toEmail, setToEmail] = useState("")
+
    const [amount, setAmount] = useState("");
    const [showTransactions, setShowTransactions] = useState(false);
+   const [showTransfer, setShowTransfer] = useState(false);
 
    //above -> only use const [..., ...] = useState() when user is interacting with it (input fields, dropdowns checkboxes, temporary UI changes)
    // DO NOT USE IT when the backend owns it (e.g account.frozen, account.balance, account.account_type)
@@ -88,6 +92,62 @@ function AccountCard({ account, onDelete, onEdit, onDeposit, onWithdrawal}) {
         }
     };
     
+    const handleTransfer = async () => { //E-Transfer -> SHOW ACCOUNT'S USER NAMES INSTEAD OF account_type
+        try {
+            const idempotencyKey = crypto.randomUUID()
+
+            const response = await authFetch(
+                `${API_URL}/accounts/${account.id}/transfer`, {
+                    method : "PATCH",
+                    headers : {
+                        "Content-Type" : "application/json"
+                    },
+                    body: JSON.stringify({
+                        from_account: account.id,
+                        to_account: selectedAccount,
+                        amount: Number(amount),
+                        idempotency_key: idempotencyKey
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Transaction Failed");
+            }
+
+            const transactions = await response.json();
+
+            onTransfer(transactions);
+            setRecipientAccounts([]);
+            setSelectedAccount("");
+            setAmount("");
+            setShowTransfer(false);
+
+        } catch (error) {
+            alert("Transaction Failed. Try again");
+            console.error("TRANSFER ERROR:", error);
+        }
+    };
+
+    const findRecipient = async () => {
+        try {
+            const response = await authFetch(
+                `${API_URL}/accounts/by-email/${encodeURIComponent(toEmail)}`
+            );
+
+            if (!response.ok) {
+                throw new Error("Recipient not found");
+            }
+
+            const accounts = await response.json();
+
+            setRecipientAccounts(accounts);
+        } catch (error) {
+            alert("Recipient not found");
+            console.error(error);
+        }
+    };
+
     //toggle button so that if your account is frozen then you can only unfreeze it vice versa
     const handleFreeze = async () => {
         try {
@@ -224,6 +284,59 @@ function AccountCard({ account, onDelete, onEdit, onDeposit, onWithdrawal}) {
             <button onClick={handleWithdrawal}>
                 Withdrawal
             </button>
+            
+            {showTransfer && ( // show this if showTransfer is true (when "E-transfer is pressed")
+                <>
+                    <input
+                        type="email"
+                        placeholder="Recipient email"
+                        value={toEmail}
+                        onChange={(e) => setToEmail(e.target.value)}
+                    />
+
+                    <button onClick={findRecipient}>
+                        Find Recipient
+                    </button>
+                </>
+            )}
+
+            {recipientAccounts.length > 0 && (
+                <select
+                    value={selectedAccount}
+                    onChange={(e) => setSelectedAccount(e.target.value)}
+                >
+                    <option value="">Select account</option>
+
+                    {recipientAccounts.map((recipientAccount) => (
+                        <option
+                            key={recipientAccount.account_id}
+                            value={recipientAccount.account_id}
+                        >
+                            {recipientAccount.account_type}
+                        </option>
+                    ))}
+                </select>
+            )}
+
+            {showTransfer && (
+                <input 
+                    type="number"
+                    placeholder="Amount"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                
+                /> 
+            )}
+
+            <button onClick={() => setShowTransfer(true)}>
+                E-transfer
+            </button>
+
+            {showTransfer && (
+                <button onClick={handleTransfer}>
+                    Send
+                </button>
+            )}
 
             <button onClick={() => setShowTransactions(!showTransactions)}>{showTransactions ? "Hide Transaction History" : "Transaction History"}</button> 
             <button onClick={handleFreeze}>{account.frozen ? "Unfreeze Account" : "Freeze"}</button>

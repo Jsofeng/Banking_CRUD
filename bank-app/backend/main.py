@@ -217,6 +217,18 @@ def get_account_id(
     return account
 
 
+@app.get("/accounts/by-email/{email}")
+def get_account_by_email(email: str, db: Session = Depends(get_db)):
+    accounts = db.query(Account).join(User).filter(User.email == email).all()
+
+    if accounts is None:
+        raise HTTPException(status_code=404, detail="Recipient not found")
+
+    return [
+        {"account_id": acc.id, "account_type": acc.account_type} for acc in accounts
+    ]
+
+
 # IMPLEMENT TO ACCOUNTCARD
 @app.put("/accounts/{id}", response_model=AccountResponse)
 def update_account(
@@ -335,7 +347,11 @@ def transfer_transaction(
     to_account = db.query(Account).filter(Account.id == transaction.to_account).first()
 
     return transfer(
-        db, from_account, to_account, transaction.amount, transaction.idempotency_key
+        db,
+        from_account.id,
+        to_account.id,
+        transaction.amount,
+        transaction.idempotency_key,
     )
 
 
